@@ -19,9 +19,7 @@ class TransportChargesData {
         int $transport_id,
         float $removal_charge,
         float $pouch_charge,
-        float $embalming_charge,
         float $transport_fees,
-        float $cremation_charge,
         float $wait_charge,
         float $mileage_fees,
         float $other_charge_1,
@@ -35,19 +33,17 @@ class TransportChargesData {
         float $total_charge
     ): int {
         $sql = "INSERT INTO transport_charges (
-            transport_id, removal_charge, pouch_charge, embalming_charge, transport_fees, cremation_charge, wait_charge, mileage_fees,
+            transport_id, removal_charge, pouch_charge, transport_fees, wait_charge, mileage_fees,
             other_charge_1, other_charge_1_description, other_charge_2, other_charge_2_description, other_charge_3, other_charge_3_description,
             other_charge_4, other_charge_4_description, total_charge
         ) VALUES (
-            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
         )";
         $params = [
             $transport_id,
             $removal_charge,
             $pouch_charge,
-            $embalming_charge,
             $transport_fees,
-            $cremation_charge,
             $wait_charge,
             $mileage_fees,
             $other_charge_1,
@@ -71,9 +67,7 @@ class TransportChargesData {
         int $transport_id,
         float $removal_charge,
         float $pouch_charge,
-        float $embalming_charge,
         float $transport_fees,
-        float $cremation_charge,
         float $wait_charge,
         float $mileage_fees,
         float $other_charge_1,
@@ -90,9 +84,7 @@ class TransportChargesData {
             transport_id = ?,
             removal_charge = ?,
             pouch_charge = ?,
-            embalming_charge = ?,
             transport_fees = ?,
-            cremation_charge = ?,
             wait_charge = ?,
             mileage_fees = ?,
             other_charge_1 = ?,
@@ -109,9 +101,7 @@ class TransportChargesData {
             $transport_id,
             $removal_charge,
             $pouch_charge,
-            $embalming_charge,
             $transport_fees,
-            $cremation_charge,
             $wait_charge,
             $mileage_fees,
             $other_charge_1,
@@ -125,7 +115,7 @@ class TransportChargesData {
             $total_charge,
             $id
         ];
-        return $this->db->execute($sql, $params);
+        return (bool)$this->db->execute($sql, $params);
     }
 
     /**
@@ -133,7 +123,7 @@ class TransportChargesData {
      */
     public function delete(int $id): bool {
         $sql = "DELETE FROM transport_charges WHERE id = ?";
-        return $this->db->execute($sql, [$id]);
+        return (bool)$this->db->execute($sql, [$id]);
     }
 
     /**
@@ -141,7 +131,7 @@ class TransportChargesData {
      */
     public function deleteByTransportId(int $transport_id): bool {
         $sql = "DELETE FROM transport_charges WHERE transport_id = ?";
-        return $this->db->execute($sql, [$transport_id]);
+        return (bool)$this->db->execute($sql, [$transport_id]);
     }
 
     /**
@@ -162,4 +152,3 @@ class TransportChargesData {
         return $result[0] ?? null;
     }
 }
-

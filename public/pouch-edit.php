@@ -1,20 +1,33 @@
 <?php
 require_once __DIR__ . '/../database/Database.php';
 require_once __DIR__ . '/../services/PouchService.php';
+require_once __DIR__ . '/../includes/validation.php';
+require_once __DIR__ . '/../includes/form_helpers.php';
+require_once __DIR__ . '/../includes/csrf.php';
 
 $db = new Database();
 $pouchService = new PouchService($db);
 
 $mode = $_GET['mode'] ?? 'add';
 $id = $_GET['id'] ?? null;
-$pouchType = '';
+$pouch_type = '';
 $success = false;
 $error = '';
+
+$fieldErrors = [
+    'pouch_type' => ''
+];
+
+function validate_pouch_fields($pouch_type) {
+    if (!$pouch_type) return 'Please fill in all required fields.';
+    if (strlen($pouch_type) > 100) return 'Pouch type must be 100 characters or less.';
+    return '';
+}
 
 if ($mode === 'edit' && $id && $_SERVER['REQUEST_METHOD'] !== 'POST') {
     $pouch = $pouchService->findById((int)$id);
     if ($pouch) {
-        $pouchType = $pouch['pouch_type'] ?? '';
+        $pouch_type = $pouch['pouch_type'] ?? '';
     } else {
         $error = 'Pouch not found.';
     }
@@ -24,34 +37,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_pouch']) && $m
     try {
         $pouchService->delete((int)$id);
         $success = 'deleted';
-        $pouchType = '';
+        $pouch_type = '';
     } catch (Exception $e) {
         $error = 'Error deleting pouch: ' . htmlspecialchars($e->getMessage());
     }
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $pouchType = trim($_POST['pouch_type'] ?? '');
-    if ($pouchType) {
-        // Prevent duplicate pouch_type on add
-        $existing = $pouchService->findByType($pouchType);
-        if (($mode === 'add' && $existing) ||
-            ($mode === 'edit' && $existing && $existing['pouch_id'] != $id)) {
-            $error = 'A pouch with this type already exists.';
-        } else {
-            try {
-                if ($mode === 'edit' && $id) {
-                    $pouchService->update((int)$id, $pouchType);
-                    $success = true;
-                } else {
-                    $pouchService->create($pouchType);
-                    $success = true;
-                    $pouchType = '';
+    $pouch_type = trim($_POST['pouch_type'] ?? '');
+    // CSRF check
+    if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
+        $error = 'Invalid CSRF token.';
+    } else {
+        $error = validate_pouch_fields($pouch_type);
+        if (!$error) {
+            // Prevent duplicate pouch_type on add
+            $existing = $pouchService->findByType($pouch_type);
+            if (($mode === 'add' && $existing) ||
+                ($mode === 'edit' && $existing && $existing['pouch_id'] != $id)) {
+                $error = 'A pouch with this type already exists.';
+            } else {
+                try {
+                    if ($mode === 'edit' && $id) {
+                        $pouchService->update((int)$id, $pouch_type);
+                        $success = true;
+                    } else {
+                        $pouchService->create($pouch_type);
+                        $success = true;
+                        $pouch_type = '';
+                    }
+                } catch (Exception $e) {
+                    $error = 'Error saving pouch: ' . htmlspecialchars($e->getMessage());
                 }
-            } catch (Exception $e) {
-                $error = 'Error saving pouch: ' . htmlspecialchars($e->getMessage());
             }
         }
-    } else {
-        $error = 'Please enter a pouch type.';
+        if ($error) {
+            if (!$pouch_type) $fieldErrors['pouch_type'] = 'Please fill out this field.';
+            elseif (strlen($pouch_type) > 100) $fieldErrors['pouch_type'] = 'Pouch type must be 100 characters or less.';
+        }
     }
 }
 ?>
@@ -106,9 +127,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_pouch']) && $m
                         <?php endif; ?>
                         <?php if ($success !== 'deleted'): ?>
                             <form method="POST">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token()) ?>">
                                 <div class="mb-3">
                                     <label for="pouch_type" class="form-label required">Pouch Type</label>
-                                    <input type="text" class="form-control" id="pouch_type" name="pouch_type" value="<?= htmlspecialchars($pouchType ?? '') ?>" required maxlength="100">
+                                    <input type="text" class="form-control<?= $fieldErrors['pouch_type'] ? ' is-invalid' : '' ?>" id="pouch_type" name="pouch_type" value="<?= htmlspecialchars($pouch_type ?? '') ?>" required maxlength="100" aria-invalid="<?= $fieldErrors['pouch_type'] ? 'true' : 'false' ?>">
+                                    <?php render_invalid_feedback($fieldErrors['pouch_type'], 'Please fill out this field.'); ?>
                                 </div>
                                 <div class="d-flex justify-content-between mt-4">
                                     <button type="submit" class="btn btn-primary"><?= $mode === 'edit' ? 'Update' : 'Add' ?> Pouch Type</button>

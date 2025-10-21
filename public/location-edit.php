@@ -14,6 +14,7 @@ require_once __DIR__ . '/../database/Database.php';
 require_once __DIR__ . '/../includes/csrf.php';
 require_once __DIR__ . '/../includes/states.php';
 require_once __DIR__ . '/../includes/validation.php';
+require_once __DIR__ . '/../includes/form_helpers.php';
 
 $db = new Database();
 $locationRepo = new LocationsData($db);
@@ -23,6 +24,15 @@ $mode = $_GET['mode'] ?? 'add';
 $id = $_GET['id'] ?? null;
 $status = '';
 $error = '';
+
+// Track field errors for UI feedback
+$fieldErrors = [
+    'name' => '',
+    'city' => '',
+    'state' => '',
+    'location_type' => '',
+    'phone_number' => '',
+];
 
 function validate_location_fields($name, $city, $state, $states, $phoneNumber, $locationType) {
     if (!$name || !$city || !$state || !$locationType) return 'Please fill in all required fields.';
@@ -67,6 +77,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location']) &&
 
     // Validate fields
     $error = validate_location_fields($name, $city, $state, $states, $phone_number, $location_type);
+    if (!$error) {
+        // Pattern validation for phone
+        if ($phone_number && !is_valid_phone($phone_number)) {
+            $fieldErrors['phone_number'] = 'Invalid phone number format.';
+            $error = 'Please correct the highlighted fields.';
+        }
+    }
+    if ($error) {
+        if (!$name) $fieldErrors['name'] = 'Please fill out this field.';
+        if (!$city) $fieldErrors['city'] = 'Please fill out this field.';
+        if (!$state) $fieldErrors['state'] = 'Please fill out this field.';
+        if (!$location_type) $fieldErrors['location_type'] = 'Please fill out this field.';
+    }
+
     if (!$error) {
         if ($mode === 'add') {
             // Prevent duplicate location names
@@ -155,7 +179,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location']) &&
                                 <div class="row form-section">
                                     <div class="col-md-6">
                                         <label for="name" class="form-label required">Location Name</label>
-                                        <input type="text" class="form-control" id="name" name="name" value="<?= htmlspecialchars($name ?? '') ?>" required>
+                                        <input type="text" class="form-control<?= $fieldErrors['name'] ? ' is-invalid' : '' ?>" id="name" name="name" value="<?= htmlspecialchars($name ?? '') ?>" required aria-invalid="<?= $fieldErrors['name'] ? 'true' : 'false' ?>">
+                                        <?php render_invalid_feedback($fieldErrors['name'], 'name'); ?>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="address" class="form-label">Address</label>
@@ -165,16 +190,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location']) &&
                                 <div class="row form-section">
                                     <div class="col-md-6">
                                         <label for="city" class="form-label required">City</label>
-                                        <input type="text" class="form-control" id="city" name="city" value="<?= htmlspecialchars($city ?? '') ?>" required>
+                                        <input type="text" class="form-control<?= $fieldErrors['city'] ? ' is-invalid' : '' ?>" id="city" name="city" value="<?= htmlspecialchars($city ?? '') ?>" required aria-invalid="<?= $fieldErrors['city'] ? 'true' : 'false' ?>">
+                                        <?php render_invalid_feedback($fieldErrors['city'], 'city'); ?>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="state" class="form-label required">State</label>
-                                        <select class="form-select" id="state" name="state" required>
+                                        <select class="form-select<?= $fieldErrors['state'] ? ' is-invalid' : '' ?>" id="state" name="state" required aria-invalid="<?= $fieldErrors['state'] ? 'true' : 'false' ?>">
                                             <option value="">Select State</option>
                                             <?php foreach ($states as $abbr => $nameState): ?>
                                                 <option value="<?= htmlspecialchars($abbr) ?>" <?= (isset($state) && $state === $abbr) ? 'selected' : '' ?>><?= htmlspecialchars($abbr) ?> - <?= htmlspecialchars($nameState) ?></option>
                                             <?php endforeach; ?>
                                         </select>
+                                        <?php render_invalid_feedback($fieldErrors['state'], 'state'); ?>
                                     </div>
                                 </div>
                                 <div class="row form-section">
@@ -184,18 +211,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_location']) &&
                                     </div>
                                     <div class="col-md-6">
                                         <label for="phone_number" class="form-label">Phone Number</label>
-                                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?= htmlspecialchars($phone_number ?? '') ?>" maxlength="14" pattern="<?= PHONE_PATTERN ?>" autocomplete="off">
+                                        <input type="text" class="form-control<?= $fieldErrors['phone_number'] ? ' is-invalid' : '' ?>" id="phone_number" name="phone_number" value="<?= htmlspecialchars($phone_number ?? '') ?>" maxlength="14" pattern="<?= PHONE_PATTERN ?>" autocomplete="off" aria-invalid="<?= $fieldErrors['phone_number'] ? 'true' : 'false' ?>">
+                                        <?php render_invalid_feedback($fieldErrors['phone_number'], 'phone_number'); ?>
                                     </div>
                                 </div>
                                 <div class="row form-section">
                                     <div class="col-md-6">
                                         <label for="location_type" class="form-label required">Location Type</label>
-                                        <select class="form-select" id="location_type" name="location_type" required>
+                                        <select class="form-select<?= $fieldErrors['location_type'] ? ' is-invalid' : '' ?>" id="location_type" name="location_type" required aria-invalid="<?= $fieldErrors['location_type'] ? 'true' : 'false' ?>">
                                             <option value="">Select Type</option>
                                             <option value="origin" <?= (isset($location_type) && $location_type === 'origin') ? 'selected' : '' ?>>Origin</option>
                                             <option value="destination" <?= (isset($location_type) && $location_type === 'destination') ? 'selected' : '' ?>>Destination</option>
                                             <option value="both" <?= (isset($location_type) && $location_type === 'both') ? 'selected' : '' ?>>Both</option>
                                         </select>
+                                        <?php render_invalid_feedback($fieldErrors['location_type'], 'location_type'); ?>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-4">

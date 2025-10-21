@@ -55,44 +55,44 @@ class CustomerService {
 
     /**
      * Check if a customer exists by company name.
-     * @param string $companyName
+     * @param string $company_name
      * @return bool
      */
-    public function existsByName($companyName) {
-        return $this->repo->existsByName($companyName);
+    public function existsByName($company_name) {
+        return $this->repo->existsByName($company_name);
     }
 
     /**
      * Create a new customer record.
-     * @param string $companyName
-     * @param string $phoneNumber
-     * @param string $address1
-     * @param string $address2
+     * @param string $company_name
+     * @param string $phone_number
+     * @param string $address_1
+     * @param string $address_2
      * @param string $city
      * @param string $state
      * @param string $zip
-     * @param string $emailAddress
+     * @param string $email_address
      * @return int|false New customer ID or false on failure
      */
-    public function create($companyName, $phoneNumber, $address1, $address2, $city, $state, $zip, $emailAddress) {
-        return $this->repo->create($companyName, $phoneNumber, $address1, $address2, $city, $state, $zip, $emailAddress);
+    public function create($company_name, $phone_number, $address_1, $address_2, $city, $state, $zip, $email_address) {
+        return $this->repo->create($company_name, $phone_number, $address_1, $address_2, $city, $state, $zip, $email_address);
     }
 
     /**
      * Update an existing customer record.
      * @param int|string $id
-     * @param string $companyName
-     * @param string $phoneNumber
-     * @param string $address1
-     * @param string $address2
+     * @param string $company_name
+     * @param string $phone_number
+     * @param string $address_1
+     * @param string $address_2
      * @param string $city
      * @param string $state
      * @param string $zip
-     * @param string $emailAddress
+     * @param string $email_address
      * @return bool|int
      */
-    public function update($id, $companyName, $phoneNumber, $address1, $address2, $city, $state, $zip, $emailAddress) {
-        return $this->repo->update($id, $companyName, $phoneNumber, $address1, $address2, $city, $state, $zip, $emailAddress);
+    public function update($id, $company_name, $phone_number, $address_1, $address_2, $city, $state, $zip, $email_address) {
+        return $this->repo->update($id, $company_name, $phone_number, $address_1, $address_2, $city, $state, $zip, $email_address);
     }
 
     /**

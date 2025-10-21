@@ -16,11 +16,16 @@ require_once __DIR__ . '/../database/Database.php';
 </div>
 <!-- transit-edit_old.php: Pure view, expects $originLocations, $destinationLocations, $coroners, $pouchTypes, $originLocation, $destinationLocation, $coronerName, $transitPermitNumber, $tagNumber, $pouchType -->
 <div id="transit-section">
+    <?php if (isset($error) && $error === 'Please fill in all required fields.'): ?>
+        <div class="alert alert-danger" role="alert">
+            <?= htmlspecialchars($error) ?>
+        </div>
+    <?php endif; ?>
     <table style="width:100%;">
         <tr>
             <td style="padding:10px;">
-                <label for="origin_location" class="required">Origin Location<span style="color:red;">*</span></label><br>
-                <select id="origin_location" name="origin_location" class="form-control" style="width:95%;" required>
+                <label for="origin_location" class="form-label required">Origin Location</label><br>
+                <select id="origin_location" name="origin_location" class="form-control<?= isset($error) && strpos($error, 'origin_location') !== false ? ' is-invalid' : '' ?>" style="width:95%;" required>
                     <option value="">Select Origin Location</option>
                     <?php foreach ($originLocations as $origin): ?>
                         <option value="<?= htmlspecialchars($origin['id']) ?>" <?= (isset($originLocation) && $originLocation == $origin['id']) ? 'selected' : '' ?>>
@@ -28,11 +33,13 @@ require_once __DIR__ . '/../database/Database.php';
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="invalid-feedback">Please fill out this field.</div>
+                <?php if (function_exists('render_invalid_feedback')) { render_invalid_feedback('Please fill out this field.', isset($error) && strpos($error, 'origin_location') !== false); } else { ?>
+                    <div class="invalid-feedback">Please fill out this field.</div>
+                <?php } ?>
             </td>
             <td style="padding:10px;">
-                <label for="destination_location" class="required">Destination Location<span style="color:red;">*</span></label><br>
-                <select id="destination_location" name="destination_location" class="form-control" style="width:95%;" required>
+                <label for="destination_location" class="form-label required">Destination Location</label><br>
+                <select id="destination_location" name="destination_location" class="form-control<?= isset($error) && strpos($error, 'destination_location') !== false ? ' is-invalid' : '' ?>" style="width:95%;" required>
                     <option value="">Select Destination Location</option>
                     <?php foreach ($destinationLocations as $destination): ?>
                         <option value="<?= htmlspecialchars($destination['id']) ?>" <?= (isset($destinationLocation) && $destinationLocation == $destination['id']) ? 'selected' : '' ?>>
@@ -40,11 +47,13 @@ require_once __DIR__ . '/../database/Database.php';
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <div class="invalid-feedback">Please fill out this field.</div>
+                <?php if (function_exists('render_invalid_feedback')) { render_invalid_feedback('Please fill out this field.', isset($error) && strpos($error, 'destination_location') !== false); } else { ?>
+                    <div class="invalid-feedback">Please fill out this field.</div>
+                <?php } ?>
             </td>
             <td style="padding:10px;">
-                <label for="coroner">Coroner<span style="color:red;">*</span></label><br>
-                <select id="coroner" name="coroner" class="form-control" style="width:95%;">
+                <label for="coroner" class="form-label required">Coroner</label><br>
+                <select id="coroner" name="coroner" class="form-control<?= isset($error) && strpos($error, 'coroner') !== false ? ' is-invalid' : '' ?>" style="width:95%;" required>
                     <option value="" <?= empty($coronerName) ? 'selected' : '' ?>>Select Coroner</option>
                     <?php foreach ($coroners as $coroner): ?>
                         <option value="<?= htmlspecialchars($coroner['id'] ?? $coroner['coroner_number']) ?>" <?= (isset($coronerName) && $coronerName === $coroner['coroner_name']) ? 'selected' : '' ?>>
@@ -52,21 +61,26 @@ require_once __DIR__ . '/../database/Database.php';
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <?php if (function_exists('render_invalid_feedback')) { render_invalid_feedback('Please fill out this field.', isset($error) && strpos($error, 'coroner') !== false); } else { ?>
+                    <div class="invalid-feedback">Please fill out this field.</div>
+                <?php } ?>
             </td>
         </tr>
         <tr>
             <td style="padding:10px;">
-                <label for="transit_permit_number">Transit Permit Number</label><br>
+                <label for="transit_permit_number" class="form-label">Transit Permit Number</label><br>
                 <input type="text" id="transit_permit_number" name="transit_permit_number" class="form-control" style="width:95%;" value="<?= htmlspecialchars($transitPermitNumber ?? '') ?>">
             </td>
             <td style="padding:10px;">
-                <label for="tag_number">Tag Number<span style="color:red;">*</span></label><br>
+                <label for="tag_number" class="form-label required">Tag Number</label><br>
                 <input type="text" id="tag_number" name="tag_number" class="form-control<?= isset($error) && strpos($error, 'tag_number') !== false ? ' is-invalid' : '' ?>" style="width:95%;" value="<?= htmlspecialchars($tagNumber ?? '') ?>" required>
-                <div class="invalid-feedback">Please fill out this field.</div>
+                <?php if (function_exists('render_invalid_feedback')) { render_invalid_feedback('Please fill out this field.', isset($error) && strpos($error, 'tag_number') !== false); } else { ?>
+                    <div class="invalid-feedback">Please fill out this field.</div>
+                <?php } ?>
             </td>
             <td style="padding:10px;">
-                <label for="pouch_type">Pouch Type<span style="color:red;">*</span></label><br>
-                <select id="pouch_type" name="pouch_type" class="form-control" style="width:95%;">
+                <label for="pouch_type" class="form-label required">Pouch Type</label><br>
+                <select id="pouch_type" name="pouch_type" class="form-control<?= isset($error) && strpos($error, 'pouch_type') !== false ? ' is-invalid' : '' ?>" style="width:95%;" required>
                     <option value="" <?= empty($pouchType) ? 'selected' : '' ?>>Select Pouch Type</option>
                     <?php foreach ($pouchTypes as $pouch): ?>
                         <?php $type = $pouch['pouch_type'] ?? $pouch['type'] ?? $pouch; ?>
@@ -75,12 +89,15 @@ require_once __DIR__ . '/../database/Database.php';
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <?php if (function_exists('render_invalid_feedback')) { render_invalid_feedback('Please fill out this field.', isset($error) && strpos($error, 'pouch_type') !== false); } else { ?>
+                    <div class="invalid-feedback">Please fill out this field.</div>
+                <?php } ?>
             </td>
         </tr>
         <tr>
             <td style="padding:10px;">
-                <label for="primary_transporter">Primary Transporter<span style="color:red;">*</span></label><br>
-                <select id="primary_transporter" name="primary_transporter" class="form-control" style="width:95%;">
+                <label for="primary_transporter" class="form-label required">Primary Transporter</label><br>
+                <select id="primary_transporter" name="primary_transporter" class="form-control<?= isset($error) && strpos($error, 'primary_transporter') !== false ? ' is-invalid' : '' ?>" style="width:95%;" required>
                     <option value="" <?= empty($primaryTransporter) ? 'selected' : '' ?>>Select Primary Transporter</option>
                     <?php foreach ($drivers as $driver): ?>
                         <option value="<?= htmlspecialchars($driver['id']) ?>" <?= (isset($primaryTransporter) && $primaryTransporter == $driver['id']) ? 'selected' : '' ?>>
@@ -88,9 +105,12 @@ require_once __DIR__ . '/../database/Database.php';
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <?php if (function_exists('render_invalid_feedback')) { render_invalid_feedback('Please fill out this field.', isset($error) && strpos($error, 'primary_transporter') !== false); } else { ?>
+                    <div class="invalid-feedback">Please fill out this field.</div>
+                <?php } ?>
             </td>
             <td style="padding:10px;">
-                <label for="assistant_transporter">Assistant Transporter</label><br>
+                <label for="assistant_transporter" class="form-label">Assistant Transporter</label><br>
                 <select id="assistant_transporter" name="assistant_transporter" class="form-control" style="width:95%;">
                     <option value="" <?= empty($assistantTransporter) ? 'selected' : '' ?>>None</option>
                     <?php foreach ($drivers as $driver): ?>

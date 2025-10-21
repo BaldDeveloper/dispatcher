@@ -55,16 +55,20 @@
 - Escape all output using `htmlspecialchars()` to prevent XSS.
 
 ### Required Fields in Forms
-- For every required field in any form, always display the message "Please fill out this field." using a Bootstrap `invalid-feedback` element directly below the field. This applies to all add/edit forms (e.g., customer-edit.php, transport-edit.php, etc.).
-- Use the HTML5 `required` attribute for all required fields.
-- Use the appropriate `pattern` attribute referencing validation constants for fields like email and phone.
-- Ensure the error message is visible when the field is invalid, matching the pattern used in customer-edit.php and transport-edit.php.
-- Maintain consistent styling and placement for required field messages across all forms in the project.
-- When adding required fields to forms, use the same validation logic, error messaging, and field styling as in `customer-edit.php`.
-- Display error messages clearly above or near the form.
-- Highlight required fields and errors using Bootstrap classes (e.g., `is-invalid`, `text-danger`).
-- Use server-side validation to check for required fields and display appropriate error messages.
-- After a successful add, always clear all form fields and display a success message, so the form is ready for a new entry.
+- For every required field in any form:
+  - Always display an asterisk (<span class="text-danger">*</span>) next to the label, using either the <code>required</code> class or explicit markup.
+  - Always display the message "Please fill out this field." using a Bootstrap <code>invalid-feedback</code> element directly below the field.
+  - Use the HTML5 <code>required</code> attribute for all required fields.
+  - Use the appropriate <code>pattern</code> attribute referencing validation constants for fields like email and phone.
+  - Ensure the error message is visible when the field is invalid, matching the pattern used in <code>customer-edit.php</code> and <code>transport-edit.php</code>.
+  - Maintain consistent styling and placement for required field messages across all forms in the project.
+  - When adding required fields to forms, use the same validation logic, error messaging, and field styling as in <code>customer-edit.php</code>.
+  - Display error messages clearly above or near the form.
+  - Highlight required fields and errors using Bootstrap classes (e.g., <code>is-invalid</code>, <code>text-danger</code>).
+  - Use server-side validation to check for required fields and display appropriate error messages.
+  - After a successful add, always clear all form fields and display a success message, so the form is ready for a new entry.
+  - Use a helper function (such as <code>render_invalid_feedback</code> in <code>form_helpers.php</code>) for rendering error messages for required fields, to ensure consistency across all forms.
+  - **Every page with required fields must have a <code>validate_&lt;page name&gt;_fields</code> function, and must display the message "Please fill in all required fields." above the form if any required field is missing. This message must always be visible at the top of the form when required fields are missing, regardless of scroll position or which field is invalid.**
 
 ### Dropdowns
 - Always include a default "Select" option as the first option in any new dropdown (`<select>`) added to the project. This option should have an empty value (`value=""`) and be selected by default when adding new records.
@@ -91,3 +95,10 @@
 - Whenever adding a new row to the data for any table (e.g., customer, coroner, transport, etc.), **clear all form fields after a successful add** so the form is ready for a new entry. This should be the default behavior unless explicitly told otherwise by the user.
 - The success message should still be displayed after the add.
 - This applies to all add forms in the project for consistency and improved user experience.
+
+## Error Highlighting for Time/Date Fields
+- When validating time or date fields (e.g., datetime-local inputs), always:
+  - Add the `is-invalid` Bootstrap class to any field with a validation error.
+  - Display a `<div class="invalid-feedback">` directly below the field, showing the specific error message if present, or the default required message otherwise.
+  - Use the same structure and logic as in `times-edit.php` (see transport-edit page) for all similar time/date validation on other pages.
+- This ensures users receive clear, field-specific feedback and consistent UI/UX across all forms.

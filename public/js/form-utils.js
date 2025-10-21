@@ -36,7 +36,47 @@ function hideFieldError(field) {
     }
 }
 
-// Export functions if using modules
-if (typeof module !== 'undefined') {
-    module.exports = { resetForm, showFieldError, hideFieldError };
-}
+// Auto-calc total for transport charges
+(function () {
+  function parseVal(v) {
+    if (v === null || v === undefined || v === '') return 0;
+    v = String(v).trim();
+    if (v === '') return 0;
+    // normalize comma decimal separators to dot
+    v = v.replace(/,/g, '.');
+    var n = parseFloat(v);
+    return isFinite(n) ? n : 0;
+  }
+
+  function updateTotal() {
+    var inputs = document.querySelectorAll('.charge-input');
+    var total = 0;
+    inputs.forEach(function (el) {
+      total += parseVal(el.value);
+    });
+    var totalEl = document.getElementById('total_charge');
+    if (totalEl) {
+      totalEl.value = total.toFixed(2);
+    }
+  }
+
+  // Wire events (input covers typing/paste; change covers some browsers)
+  document.addEventListener('input', function (e) {
+    if (e.target && e.target.classList && e.target.classList.contains('charge-input')) {
+      updateTotal();
+    }
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.classList && e.target.classList.contains('charge-input')) {
+      updateTotal();
+    }
+  });
+
+  // initial calc on page load
+  document.addEventListener('DOMContentLoaded', updateTotal);
+
+  // export for CommonJS (tests) if present
+  if (typeof module !== 'undefined') {
+    module.exports = Object.assign(module.exports || {}, { resetForm: typeof resetForm !== 'undefined' ? resetForm : undefined, updateTotal: updateTotal, showFieldError: typeof showFieldError !== 'undefined' ? showFieldError : undefined, hideFieldError: typeof hideFieldError !== 'undefined' ? hideFieldError : undefined });
+  }
+})();

@@ -13,6 +13,7 @@ require_once __DIR__ . '/../database/Database.php';
 require_once __DIR__ . '/../services/UserService.php';
 require_once __DIR__ . '/../includes/csrf.php';
 require_once __DIR__ . '/../includes/validation.php';
+require_once __DIR__ . '/../includes/form_helpers.php';
 
 $db = new Database();
 $userService = new UserService($db);
@@ -30,6 +31,14 @@ $roles = [
 ];
 
 $states = include __DIR__ . '/../includes/states.php';
+
+$fieldErrors = [
+    'username' => '',
+    'full_name' => '',
+    'state' => '',
+    'role' => '',
+    'password' => '',
+];
 
 function validate_user_fields($username, $full_name, $role, $roles, $password, $mode) {
     if (!$username || !$full_name || !$role) return 'Please fill in all required fields.';
@@ -77,7 +86,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user']) && $mo
 
     // Validate fields
     $error = validate_user_fields($username, $full_name, $role, $roles, $password, $mode);
-    if (!$error) {
+    if ($error) {
+        if (!$username) $fieldErrors['username'] = 'Please fill out this field.';
+        if (!$full_name) $fieldErrors['full_name'] = 'Please fill out this field.';
+        if (!$state) $fieldErrors['state'] = 'Please fill out this field.';
+        if (!$role) $fieldErrors['role'] = 'Please fill out this field.';
+        if ($mode === 'add' && !$password) $fieldErrors['password'] = 'Please fill out this field.';
+    } else {
         if ($mode === 'add') {
             // Prevent duplicate usernames
             if ($userService->existsByName($username)) {
@@ -150,11 +165,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user']) && $mo
                                 <div class="row form-section">
                                     <div class="col-md-6">
                                         <label for="username" class="form-label required">Username</label>
-                                        <input type="text" class="form-control" id="username" name="username" value="<?= htmlspecialchars($username ?? '') ?>" required>
+                                        <input type="text" class="form-control<?= $fieldErrors['username'] ? ' is-invalid' : '' ?>" id="username" name="username" value="<?= htmlspecialchars($username ?? '') ?>" required autocomplete="username">
+                                        <?php render_invalid_feedback($fieldErrors['username'], 'username'); ?>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="full_name" class="form-label required">Full Name</label>
-                                        <input type="text" class="form-control" id="full_name" name="full_name" value="<?= htmlspecialchars($full_name ?? '') ?>" required>
+                                        <input type="text" class="form-control<?= $fieldErrors['full_name'] ? ' is-invalid' : '' ?>" id="full_name" name="full_name" value="<?= htmlspecialchars($full_name ?? '') ?>" required>
+                                        <?php render_invalid_feedback($fieldErrors['full_name'], 'full_name'); ?>
                                     </div>
                                 </div>
                                 <div class="row form-section">
@@ -168,15 +185,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user']) && $mo
                                     </div>
                                     <div class="col-md-3">
                                         <label for="state" class="form-label required">State</label>
-                                        <select class="form-select<?= ($error && !$state) ? ' is-invalid' : '' ?>" id="state" name="state" required>
+                                        <select class="form-select<?= $fieldErrors['state'] ? ' is-invalid' : '' ?>" id="state" name="state" required>
                                             <option value="">Select State</option>
                                             <?php foreach ($states as $abbr => $name): ?>
                                                 <option value="<?= htmlspecialchars($abbr) ?>" <?= (isset($state) && $state === $abbr) ? 'selected' : '' ?>><?= htmlspecialchars($abbr) ?> - <?= htmlspecialchars($name) ?></option>
                                             <?php endforeach; ?>
                                         </select>
-                                        <div class="invalid-feedback">
-                                            Please fill out this field.
-                                        </div>
+                                        <?php render_invalid_feedback($fieldErrors['state'], 'state'); ?>
                                     </div>
                                 </div>
                                 <div class="row form-section">
@@ -190,12 +205,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user']) && $mo
                                     </div>
                                     <div class="col-md-3">
                                         <label for="role" class="form-label required">Role</label>
-                                        <select class="form-select" id="role" name="role" required>
+                                        <select class="form-select<?= $fieldErrors['role'] ? ' is-invalid' : '' ?>" id="role" name="role" required>
                                             <option value="">Select Role</option>
                                             <?php foreach ($roles as $key => $label): ?>
                                                 <option value="<?= htmlspecialchars($key) ?>" <?= (isset($role) && $role === $key) ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
                                             <?php endforeach; ?>
                                         </select>
+                                        <?php render_invalid_feedback($fieldErrors['role'], 'role'); ?>
                                     </div>
                                     <div class="col-md-3 d-flex align-items-center">
                                         <div class="form-check mt-4">
@@ -207,7 +223,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_user']) && $mo
                                 <div class="row form-section">
                                     <div class="col-md-6">
                                         <label for="password" class="form-label<?= $mode === 'add' ? ' required' : '' ?>">Password<?= $mode === 'add' ? '' : ' (leave blank to keep current)' ?></label>
-                                        <input type="password" class="form-control" id="password" name="password" <?= $mode === 'add' ? 'required' : '' ?> autocomplete="new-password">
+                                        <input type="password" class="form-control<?= $fieldErrors['password'] ? ' is-invalid' : '' ?>" id="password" name="password" <?= $mode === 'add' ? 'required' : '' ?> autocomplete="new-password">
+                                        <?php render_invalid_feedback($fieldErrors['password'], 'password'); ?>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-4">

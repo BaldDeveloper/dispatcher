@@ -15,7 +15,7 @@ require_once __DIR__ . '/../database/Database.php';
     <table style="width:100%;">
         <tr>
             <td style="padding:10px;">
-                <label for="mileage">Mileage <span class="required" style="color:red;">*</span></label><br>
+                <label for="mileage" class="form-label required">Mileage</label><br>
                 <input type="number" name="mileage" id="mileage" class="form-control" style="width:95%;" step="0.01" min="0" required value="<?= htmlspecialchars($mileage ?? '') ?>">
                 <div class="invalid-feedback">Please fill out this field.</div>
             </td>

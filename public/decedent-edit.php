@@ -19,13 +19,13 @@ require_once __DIR__ . '/../services/DecedentService.php';
     <table style="width:100%;">
         <tr>
             <td style="padding:10px;">
-                <label for="first_name">First Name<span style="color:red;">*</span></label><br>
+                <label for="first_name" class="form-label required">First Name</label><br>
                 <input type="text" id="first_name" name="first_name" class="form-control" required style="width:95%;"
                        value="<?= htmlspecialchars($decedentFirstName ?? '') ?>">
                 <div class="invalid-feedback">Please fill out this field.</div>
             </td>
             <td style="padding:10px;">
-                <label for="last_name">Last Name<span style="color:red;">*</span></label><br>
+                <label for="last_name" class="form-label required">Last Name</label><br>
                 <input type="text" id="last_name" name="last_name" class="form-control" required style="width:95%;"
                        value="<?= htmlspecialchars($decedentLastName ?? '') ?>">
                 <div class="invalid-feedback">Please fill out this field.</div>
@@ -33,8 +33,8 @@ require_once __DIR__ . '/../services/DecedentService.php';
         </tr>
         <tr>
             <td style="padding:10px;">
-                <label for="ethnicity">Ethnicity<span style="color:red;">*</span></label><br>
-                <select id="ethnicity" name="ethnicity" class="form-control" style="width:95%;">
+                <label for="ethnicity" class="form-label required">Ethnicity</label><br>
+                <select id="ethnicity" name="ethnicity" class="form-control" required style="width:95%;">
                     <option value="" <?= empty($decedentEthnicity) ? 'selected' : '' ?>>Select Ethnicity</option>
                     <?php foreach ($ethnicities as $ethnicity): ?>
                         <option value="<?= htmlspecialchars($ethnicity) ?>" <?= (isset($decedentEthnicity) && $decedentEthnicity === $ethnicity) ? 'selected' : '' ?>>
@@ -42,10 +42,11 @@ require_once __DIR__ . '/../services/DecedentService.php';
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <div class="invalid-feedback">Please fill out this field.</div>
             </td>
             <td style="padding:10px;">
-                <label for="gender">Gender<span style="color:red;">*</span></label><br>
-                <select id="gender" name="gender" class="form-control" style="width:95%;">
+                <label for="gender" class="form-label required">Gender</label><br>
+                <select id="gender" name="gender" class="form-control" required style="width:95%;">
                     <option value="" <?= empty($decedentGender) ? 'selected' : '' ?>>Select Gender</option>
                     <?php foreach ($genders as $gender): ?>
                         <option value="<?= htmlspecialchars($gender) ?>" <?= (isset($decedentGender) && $decedentGender === $gender) ? 'selected' : '' ?>>
@@ -53,6 +54,7 @@ require_once __DIR__ . '/../services/DecedentService.php';
                         </option>
                     <?php endforeach; ?>
                 </select>
+                <div class="invalid-feedback">Please fill out this field.</div>
             </td>
         </tr>
     </table>

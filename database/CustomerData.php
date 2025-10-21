@@ -18,10 +18,10 @@ class CustomerData {
     }
 
     public function create(
-        string $companyName,
-        string $phoneNumber,
-        string $address1,
-        string $address2,
+        string $company_name,
+        string $phone_number,
+        string $address_1,
+        string $address_2,
         string $city,
         string $state,
         string $zip,
@@ -29,16 +29,16 @@ class CustomerData {
     ): int {
         return $this->db->insert(
             "INSERT INTO customer (company_name, phone_number, address_1, address_2, city, state, zip, email_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [$companyName, $phoneNumber, $address1, $address2, $city, $state, $zip, $email]
+            [$company_name, $phone_number, $address_1, $address_2, $city, $state, $zip, $email]
         );
     }
 
     public function update(
-        int $customerNumber,
-        string $companyName,
-        string $phoneNumber,
-        string $address1,
-        string $address2,
+        int $customer_number,
+        string $company_name,
+        string $phone_number,
+        string $address_1,
+        string $address_2,
         string $city,
         string $state,
         string $zip,
@@ -46,7 +46,7 @@ class CustomerData {
     ): int {
         return $this->db->execute(
             "UPDATE customer SET company_name = ?, phone_number = ?, address_1 = ?, address_2 = ?, city = ?, state = ?, zip = ?, email_address = ? WHERE customer_number = ?",
-            [$companyName, $phoneNumber, $address1, $address2, $city, $state, $zip, $email, $customerNumber]
+            [$company_name, $phone_number, $address_1, $address_2, $city, $state, $zip, $email, $customer_number]
         );
     }
 
@@ -70,8 +70,8 @@ class CustomerData {
         );
     }
 
-    public function existsByName(string $companyName): bool {
-        $result = $this->db->query("SELECT customer_number FROM customer WHERE company_name = ? LIMIT 1", [$companyName]);
+    public function existsByName(string $company_name): bool {
+        $result = $this->db->query("SELECT customer_number FROM customer WHERE company_name = ? LIMIT 1", [$company_name]);
         return !empty($result);
     }
 

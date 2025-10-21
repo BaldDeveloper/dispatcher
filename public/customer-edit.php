@@ -12,11 +12,12 @@
  * NOTE: Role-based access control is currently commented out for development/testing purposes.
  * Uncomment when ready for production.
  */
-// session_start();
-// if (!isset(_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-//     header('Location: login.php');
-//     exit;
-// }
+session_start();
+// // Example role check - uncomment and adapt as needed
+// // if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+// //     header('Location: login.php');
+// //     exit;
+// // }
 
 require_once __DIR__ . '/../database/Database.php';
 require_once __DIR__ . '/../services/CustomerService.php';
@@ -29,107 +30,132 @@ $db = new Database();
 $customerService = new CustomerService($db);
 
 $mode = $_GET['mode'] ?? 'add';
-$id = $_GET['id'] ?? null;
+$id = isset($_GET['id']) ? (int)$_GET['id'] : null; // cast to int for safety
 $status = '';
 $error = '';
+
+// Initialize form variables to avoid undefined variable notices in the view
+$company_name = $phone_number = $email_address = $address_1 = $address_2 = $city = $state = $zip = '';
+
+// Server-side CSRF validation for all POST requests. If token is invalid, set $error
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $postedToken = $_POST['csrf_token'] ?? '';
+    if (!function_exists('validate_csrf_token') || !validate_csrf_token($postedToken)) {
+        $error = 'Invalid request (CSRF token mismatch).';
+    }
+}
 
 /**
  * Validate customer fields for add/edit
  *
- * @param string $companyName
- * @param string $emailAddress
+ * @param string $company_name
+ * @param string $email_address
  * @param string $city
  * @param string $state
  * @param array $states
- * @param string $phoneNumber
+ * @param string $phone_number
  * @return string Error message or empty string if valid
  */
-function validate_customer_fields($companyName, $emailAddress, $city, $state, $states, $phoneNumber) {
-    if (!$companyName || !$state || !$emailAddress || !$city) return 'Please fill in all required fields.';
+function validate_customer_fields($company_name, $email_address, $city, $state, $states, $phone_number) {
+    if (!$company_name || !$state || !$email_address || !$city) return 'Please fill in all required fields.';
     if (!array_key_exists($state, $states)) return 'Invalid state selected.';
-    if (!is_valid_email($emailAddress)) return 'Invalid email address.';
-    if ($phoneNumber !== '' && !is_valid_phone($phoneNumber)) return 'Invalid phone number format.';
+    if (!is_valid_email($email_address)) return 'Invalid email address.';
+    if ($phone_number !== '' && !is_valid_phone($phone_number)) return 'Invalid phone number format.';
     return '';
+}
+
+/**
+ * Sanitize and trim all customer input fields
+ */
+function sanitize_and_trim_customer_fields($input) {
+    return [
+        'company_name' => trim($input['company_name'] ?? ''),
+        'phone_number' => trim($input['phone_number'] ?? ''),
+        'email_address' => trim($input['email_address'] ?? ''),
+        'address_1' => trim($input['address_1'] ?? ''),
+        'address_2' => trim($input['address_2'] ?? ''),
+        'city' => trim($input['city'] ?? ''),
+        'state' => trim($input['state'] ?? ''),
+        'zip' => trim($input['zip'] ?? '')
+    ];
+}
+
+/**
+ * Normalize customer fields for DB
+ */
+function normalize_customer_fields_for_db($fields) {
+    return [
+        $fields['company_name'],
+        $fields['phone_number'],
+        $fields['address_1'],
+        $fields['address_2'],
+        $fields['city'],
+        $fields['state'],
+        $fields['zip'],
+        $fields['email_address']
+    ];
 }
 
 // If editing, load existing customer data
 if ($mode === 'edit' && $id && $_SERVER['REQUEST_METHOD'] !== 'POST') {
     $customer = $customerService->findByCustomerNumber($id);
     if ($customer) {
-        $companyName = $customer['company_name'] ?? '';
-        $phoneNumber = $customer['phone_number'] ?? '';
-        $emailAddress = $customer['email_address'] ?? '';
-        $address1 = $customer['address_1'] ?? '';
-        $address2 = $customer['address_2'] ?? '';
+        $company_name = $customer['company_name'] ?? '';
+        $phone_number = $customer['phone_number'] ?? '';
+        $email_address = $customer['email_address'] ?? '';
+        $address_1 = $customer['address_1'] ?? '';
+        $address_2 = $customer['address_2'] ?? '';
         $city = $customer['city'] ?? '';
         $state = $customer['state'] ?? '';
         $zip = $customer['zip'] ?? '';
     }
 }
 
-// Handle delete request
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_customer']) && $mode === 'edit' && $id) {
+// Handle delete request (only proceed if CSRF validation passed)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$error && isset($_POST['delete_customer']) && $mode === 'edit' && $id) {
     try {
         $customerService->delete($id);
         $status = 'deleted';
         // Clear form values so form does not show after deletion
-        $companyName = $phoneNumber = $emailAddress = $address1 = $address2 = $city = $state = $zip = '';
+        $company_name = $phone_number = $email_address = $address_1 = $address_2 = $city = $state = $zip = '';
     } catch (Exception $e) {
-        $error = 'Error deleting customer: ' . htmlspecialchars($e->getMessage());
+        // Log full error, show generic message
+        error_log($e->getMessage());
+        $error = 'An internal error occurred while deleting the customer.';
     }
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !$error) {
     // Sanitize and trim input values
-    $companyName = trim($_POST['company_name'] ?? '');
-    $phoneNumber = trim($_POST['phone_number'] ?? '');
-    $emailAddress = trim($_POST['email_address'] ?? '');
-    $address1 = trim($_POST['address_1'] ?? '');
-    $address2 = trim($_POST['address_2'] ?? '');
-    $city = trim($_POST['city'] ?? '');
-    $state = trim($_POST['state'] ?? '');
-    $zip = trim($_POST['zip'] ?? '');
-
+    $fields = sanitize_and_trim_customer_fields($_POST);
+    extract($fields);
     // Validate fields
-    $error = validate_customer_fields($companyName, $emailAddress, $city, $state, $states, $phoneNumber);
+    $error = validate_customer_fields($company_name, $email_address, $city, $state, $states, $phone_number);
     if (!$error) {
         if ($mode === 'add') {
             // Prevent duplicate customer names
-            if ($customerService->existsByName($companyName)) {
+            if ($customerService->existsByName($company_name)) {
                 $error = 'A customer with this company name already exists.';
             } else {
                 try {
-                    $customerService->create(
-                        $companyName,
-                        $phoneNumber,
-                        $address1,
-                        $address2,
-                        $city,
-                        $state,
-                        $zip,
-                        $emailAddress
-                    );
+                    $dbFields = normalize_customer_fields_for_db($fields);
+                    $customerService->create(...$dbFields);
                     $status = 'added';
                     // Clear form fields after successful add
-                    $companyName = $phoneNumber = $emailAddress = $address1 = $address2 = $city = $state = $zip = '';
+                    foreach ($fields as $key => $val) {
+                        $$key = '';
+                    }
                 } catch (Exception $e) {
-                    $error = 'Error adding customer: ' . htmlspecialchars($e->getMessage());
+                    error_log($e->getMessage());
+                    $error = 'An internal error occurred while adding the customer.';
                 }
             }
         } elseif ($mode === 'edit' && $id) {
             try {
-                $customerService->update(
-                    $id,
-                    $companyName,
-                    $phoneNumber,
-                    $address1,
-                    $address2,
-                    $city,
-                    $state,
-                    $zip,
-                    $emailAddress
-                );
+                $dbFields = normalize_customer_fields_for_db($fields);
+                $customerService->update($id, ...$dbFields);
                 $status = 'updated';
             } catch (Exception $e) {
-                $error = 'Error updating customer: ' . htmlspecialchars($e->getMessage());
+                error_log($e->getMessage());
+                $error = 'An internal error occurred while updating the customer.';
             }
         }
     }
@@ -170,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_customer']) &&
             <div class="container-xl px-4 mt-n-custom-6">
                 <div id="default">
                     <div class="card mb-4 w-100">
-                        <div class="card-header">Add Customer</div>
+                        <div class="card-header"><?php echo ($mode === 'edit') ? 'Edit Customer' : 'Add Customer'; ?></div>
                         <div class="card-body">
                             <?php if ($status === 'deleted'): ?>
                                 <div class="alert alert-success" role="alert">
@@ -178,11 +204,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_customer']) &&
                                 </div>
                             <?php elseif ($status === 'added' || $status === 'updated'): ?>
                                 <div class="alert alert-success" role="alert">
-                                    Customer <?= $status === 'added' ? 'added' : 'updated' ?> successfully!
+                                    Customer <?php echo $status === 'added' ? 'added' : 'updated' ?> successfully!
                                 </div>
                             <?php elseif ($error): ?>
                                 <div class="alert alert-danger" role="alert">
-                                    <?= $error ?>
+                                    <?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?>
                                 </div>
                             <?php endif; ?>
                             <?php if ($status !== 'deleted'): ?>
@@ -194,24 +220,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_customer']) &&
                                 <div class="row form-section">
                                     <div class="col-md-6">
                                         <label for="company_name" class="form-label required">Company Name</label>
-                                        <input type="text" class="form-control<?= ($error && !$companyName) ? ' is-invalid' : '' ?>" id="company_name" name="company_name" value="<?= htmlspecialchars($companyName ?? '') ?>" required>
-                                        <?php render_invalid_feedback('Please fill out this field.', $error && !$companyName); ?>
+                                        <input type="text" class="form-control<?= ($error && !$company_name) ? ' is-invalid' : '' ?>" id="company_name" name="company_name" value="<?= htmlspecialchars($company_name ?? '') ?>" required>
+                                        <?php render_invalid_feedback('Please fill out this field.', $error && !$company_name); ?>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="phone_number" class="form-label">Phone Number</label>
-                                        <input type="text" class="form-control<?= ($error && $phoneNumber !== '' && !is_valid_phone($phoneNumber)) ? ' is-invalid' : '' ?>" id="phone_number" name="phone_number" value="<?= htmlspecialchars($phoneNumber ?? '') ?>" maxlength="14" pattern="<?= PHONE_PATTERN ?>" autocomplete="off">
-                                        <?php render_invalid_feedback('Invalid phone number format.', $error && $phoneNumber !== '' && !is_valid_phone($phoneNumber)); ?>
+                                        <input type="text" class="form-control<?= ($error && $phone_number !== '' && !is_valid_phone($phone_number)) ? ' is-invalid' : '' ?>" id="phone_number" name="phone_number" value="<?= htmlspecialchars($phone_number ?? '') ?>" maxlength="14" pattern="<?= PHONE_PATTERN ?>" autocomplete="off">
+                                        <?php render_invalid_feedback('Invalid phone number format.', $error && $phone_number !== '' && !is_valid_phone($phone_number)); ?>
                                     </div>
                                 </div>
                                 <div class="row form-section">
                                     <div class="col-md-6">
                                         <label for="address_1" class="form-label required">Address 1</label>
-                                        <input type="text" class="form-control<?= ($error && !$address1) ? ' is-invalid' : '' ?>" id="address_1" name="address_1" value="<?= htmlspecialchars($address1 ?? '') ?>" required>
-                                        <?php render_invalid_feedback('Please fill out this field.', $error && !$address1); ?>
+                                        <input type="text" class="form-control<?= ($error && !$address_1) ? ' is-invalid' : '' ?>" id="address_1" name="address_1" value="<?= htmlspecialchars($address_1 ?? '') ?>" required>
+                                        <?php render_invalid_feedback('Please fill out this field.', $error && !$address_1); ?>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="address_2" class="form-label">Address 2</label>
-                                        <input type="text" class="form-control" id="address_2" name="address_2" value="<?= htmlspecialchars($address2 ?? '') ?>">
+                                        <input type="text" class="form-control" id="address_2" name="address_2" value="<?= htmlspecialchars($address_2 ?? '') ?>">
                                     </div>
                                 </div>
                                 <div class="row form-section">
@@ -238,8 +264,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_customer']) &&
                                 <div class="row form-section">
                                     <div class="col-md-6">
                                         <label for="email_address" class="form-label required">Email Address</label>
-                                        <input type="email" class="form-control email-pattern<?= ($error && !is_valid_email($emailAddress)) ? ' is-invalid' : '' ?>" id="email_address" name="email_address" value="<?= htmlspecialchars($emailAddress ?? '') ?>" required pattern="<?= EMAIL_PATTERN ?>">
-                                        <?php render_invalid_feedback('Please fill out this field.', $error && !is_valid_email($emailAddress)); ?>
+                                        <input type="email" class="form-control email-pattern<?= ($error && !is_valid_email($email_address)) ? ' is-invalid' : '' ?>" id="email_address" name="email_address" value="<?= htmlspecialchars($email_address ?? '') ?>" required pattern="<?= EMAIL_PATTERN ?>">
+                                        <?php render_invalid_feedback('Please fill out this field.', $error && !is_valid_email($email_address)); ?>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-4">

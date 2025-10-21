@@ -25,6 +25,7 @@ require_once __DIR__ . '/../database/Database.php';
 require_once __DIR__ . '/../services/CoronerService.php';
 require_once __DIR__ . '/../includes/csrf.php';
 require_once __DIR__ . '/../includes/validation.php';
+require_once __DIR__ . '/../includes/form_helpers.php';
 $states = include __DIR__ . '/../includes/states.php';
 $counties = include __DIR__ . '/../includes/counties.php';
 
@@ -35,6 +36,14 @@ $id = $_GET['id'] ?? null;
 $status = '';
 $error = '';
 
+// Initialize field errors for all expected fields
+$fieldErrors = [
+    'coroner_name' => '',
+    'county' => '',
+    'phone_number' => '',
+    'email_address' => '',
+];
+
 /**
  * Validate coroner fields for add/edit
  * @return string Error message or empty string if valid
@@ -44,10 +53,42 @@ $error = '';
 function validate_coroner_fields($name, $county, $phone, $email, $city, $state, $states, $counties) {
     if (!$name || !$county) return 'Please fill in all required fields.';
     if (!in_array($county, $counties)) return 'Invalid county selection.';
-    if ($phone !== '' && !is_valid_phone($phone)) return 'Invalid phone number format.';
-    if ($email !== '' && !is_valid_email($email)) return 'Invalid email address.';
     if ($state !== '' && !array_key_exists($state, $states)) return 'Invalid state selection.';
     return '';
+}
+
+/**
+ * Sanitize and trim all coroner input fields
+ */
+function sanitize_and_trim_coroner_fields($input) {
+    return [
+        'coroner_name' => trim($input['coroner_name'] ?? ''),
+        'county' => trim($input['county'] ?? ''),
+        'phone_number' => trim($input['phone_number'] ?? ''),
+        'email_address' => trim($input['email_address'] ?? ''),
+        'address_1' => trim($input['address_1'] ?? ''),
+        'address_2' => trim($input['address_2'] ?? ''),
+        'city' => trim($input['city'] ?? ''),
+        'state' => trim($input['state'] ?? ''),
+        'zip' => trim($input['zip'] ?? '')
+    ];
+}
+
+/**
+ * Normalize coroner fields for DB
+ */
+function normalize_coroner_fields_for_db($fields) {
+    return [
+        $fields['coroner_name'],
+        $fields['phone_number'],
+        $fields['email_address'],
+        $fields['address_1'],
+        $fields['address_2'],
+        $fields['city'],
+        $fields['state'],
+        $fields['zip'],
+        $fields['county']
+    ];
 }
 
 // If editing, load existing coroner data
@@ -86,40 +127,40 @@ if (
         $error = 'Invalid CSRF token.';
     } else {
         // Sanitize and trim input values
-        $coronerName = trim($_POST['coroner_name'] ?? '');
-        $county = trim($_POST['county'] ?? '');
-        $phoneNumber = trim($_POST['phone_number'] ?? '');
-        $emailAddress = trim($_POST['email_address'] ?? '');
-        $address1 = trim($_POST['address_1'] ?? '');
-        $address2 = trim($_POST['address_2'] ?? '');
-        $city = trim($_POST['city'] ?? '');
-        $state = trim($_POST['state'] ?? '');
-        $zip = trim($_POST['zip'] ?? '');
-
+        $fields = sanitize_and_trim_coroner_fields($_POST);
+        extract($fields);
         // Validate fields
-        $error = validate_coroner_fields($coronerName, $county, $phoneNumber, $emailAddress, $city, $state, $states, $counties);
+        $error = validate_coroner_fields($coroner_name, $county, $phone_number, $email_address, $city, $state, $states, $counties);
+        if (!$error) {
+            // Pattern validation for email and phone
+            if ($email_address && !is_valid_email($email_address)) {
+                $fieldErrors['email_address'] = 'Invalid email format.';
+                $error = 'Please correct the highlighted fields.';
+            }
+            if ($phone_number && !is_valid_phone($phone_number)) {
+                $fieldErrors['phone_number'] = 'Invalid phone number format.';
+                $error = 'Please correct the highlighted fields.';
+            }
+        }
+        if ($error) {
+            if (!$coroner_name) $fieldErrors['coroner_name'] = 'Please fill out this field.';
+            if (!$county) $fieldErrors['county'] = 'Please fill out this field.';
+        }
         if (!$error) {
             if ($mode === 'add') {
                 // Prevent duplicate coroner names
-                if ($coronerService->existsByName($coronerName)) {
+                if ($coronerService->existsByName($coroner_name)) {
                     $error = 'A coroner with this name already exists.';
                 } else {
                     try {
                         // Create new coroner record
-                        $coronerService->create(
-                            $coronerName,
-                            $phoneNumber,
-                            $emailAddress,
-                            $address1,
-                            $address2,
-                            $city,
-                            $state,
-                            $zip,
-                            $county
-                        );
+                        $dbFields = normalize_coroner_fields_for_db($fields);
+                        $coronerService->create(...$dbFields);
                         $status = 'added';
-                        // Clear form fields after successful add, like customer-edit.php
-                        $coronerName = $county = $phoneNumber = $emailAddress = $address1 = $address2 = $city = $state = $zip = '';
+                        // Clear form fields after successful add
+                        foreach ($fields as $key => $val) {
+                            $$key = '';
+                        }
                     } catch (Exception $e) {
                         $error = 'Error adding coroner: ' . htmlspecialchars($e->getMessage());
                     }
@@ -127,18 +168,8 @@ if (
             } elseif ($mode === 'edit' && $id) {
                 try {
                     // Update existing coroner record
-                    $coronerService->update(
-                        $id,
-                        $coronerName,
-                        $phoneNumber,
-                        $emailAddress,
-                        $address1,
-                        $address2,
-                        $city,
-                        $state,
-                        $zip,
-                        $county
-                    );
+                    $dbFields = normalize_coroner_fields_for_db($fields);
+                    $coronerService->update($id, ...$dbFields);
                     $status = 'updated';
                 } catch (Exception $e) {
                     $error = 'Error updating coroner: ' . htmlspecialchars($e->getMessage());
@@ -203,16 +234,18 @@ if (
                                 <div class="row form-section">
                                     <div class="col-md-6">
                                         <label for="coroner_name" class="form-label required">Coroner Name</label>
-                                        <input type="text" class="form-control" id="coroner_name" name="coroner_name" value="<?= htmlspecialchars($coronerName ?? '') ?>" required>
+                                        <input type="text" class="form-control<?= $fieldErrors['coroner_name'] ? ' is-invalid' : '' ?>" id="coroner_name" name="coroner_name" value="<?= htmlspecialchars($coronerName ?? '') ?>" required aria-invalid="<?= $fieldErrors['coroner_name'] ? 'true' : 'false' ?>">
+                                        <?php render_invalid_feedback('Please fill out this field.', $fieldErrors['coroner_name'] !== ''); ?>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="county" class="form-label required">County</label>
-                                        <select class="form-select" id="county" name="county" required>
+                                        <select class="form-select<?= $fieldErrors['county'] ? ' is-invalid' : '' ?>" id="county" name="county" required aria-invalid="<?= $fieldErrors['county'] ? 'true' : 'false' ?>">
                                             <option value="">Select County</option>
                                             <?php foreach ($counties as $c): ?>
                                                 <option value="<?= htmlspecialchars($c) ?>" <?= (isset($county) && $county === $c) ? 'selected' : '' ?>><?= htmlspecialchars($c) ?></option>
                                             <?php endforeach; ?>
                                         </select>
+                                        <?php render_invalid_feedback('Please fill out this field.', $fieldErrors['county'] !== ''); ?>
                                     </div>
                                 </div>
                                 <!-- Address Fields -->
@@ -250,11 +283,13 @@ if (
                                 <div class="row form-section">
                                     <div class="col-md-6">
                                         <label for="email_address" class="form-label">Email Address</label>
-                                        <input type="email" class="form-control email-pattern" id="email_address" name="email_address" value="<?= htmlspecialchars($emailAddress ?? '') ?>" pattern="<?= EMAIL_PATTERN ?>">
+                                        <input type="email" class="form-control email-pattern<?= $fieldErrors['email_address'] ? ' is-invalid' : '' ?>" id="email_address" name="email_address" value="<?= htmlspecialchars($emailAddress ?? '') ?>" pattern="<?= EMAIL_PATTERN ?>" aria-invalid="<?= $fieldErrors['email_address'] ? 'true' : 'false' ?>">
+                                        <?php render_invalid_feedback($fieldErrors['email_address'] ?: 'Invalid email format.', $fieldErrors['email_address'] !== ''); ?>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="phone_number" class="form-label">Phone Number</label>
-                                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?= htmlspecialchars($phoneNumber ?? '') ?>" maxlength="14" pattern="<?= PHONE_PATTERN ?>" autocomplete="off">
+                                        <input type="text" class="form-control<?= $fieldErrors['phone_number'] ? ' is-invalid' : '' ?>" id="phone_number" name="phone_number" value="<?= htmlspecialchars($phoneNumber ?? '') ?>" maxlength="14" pattern="<?= PHONE_PATTERN ?>" autocomplete="off" aria-invalid="<?= $fieldErrors['phone_number'] ? 'true' : 'false' ?>">
+                                        <?php render_invalid_feedback($fieldErrors['phone_number'] ?: 'Invalid phone number format.', $fieldErrors['phone_number'] !== ''); ?>
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-between mt-4">

@@ -27,6 +27,15 @@ class Database {
         }
     }
 
+    /**
+     * Get the PDO instance
+     * @return PDO
+     */
+    public function getPdo(): PDO
+    {
+        return $this->pdo;
+    }
+
     // Generic query executor
     public function query(string $sql, array $params = []): array {
         $stmt = $this->pdo->prepare($sql);
