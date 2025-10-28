@@ -2,68 +2,53 @@
 
 ## 🧱 Stack Summary
 - **Frontend**: HTML, CSS, JavaScript, Bootstrap
-- **Backend**: Node.js + Express
+- **Backend**: PHP (primary) — services/, includes/, database/
+- **Optional helper**: Node.js + Express present (lightweight static server in `server.js`) but not the primary application backend
 - **Database**: MySQL
-- **Authentication**: bcryptjs + express-session
-- **Environment Management**: dotenv
+- **Authentication**: PHP sessions (`session_start()`), PHP password hashing (`password_hash` / `password_verify`)
+- **Environment / Configuration**: `includes/config.php` (PHP config array)
+
+> Notes: The repository contains a `server.js` and an `express` dependency in `package.json`, but the application logic, authentication, and database access are implemented in PHP files under `public/`, `services/`, `includes/`, and `database/`.
 
 ## 🧭 Layered Architecture
 
 | Layer       | Technology         | Purpose                          |
 |-------------|--------------------|----------------------------------|
 | Frontend    | HTML/CSS/JS/Bootstrap | UI, client-side logic, modular layout |
-| Backend     | Node.js + Express  | API routing and business logic   |
+| Backend     | PHP (services + includes + public entry scripts) | Business logic, form handlers, authentication |
+| Static Server (optional) | Node.js + Express | Serve static assets or proxy during development (optional helper) |
 | Database    | MySQL              | Persistent data storage          |
-| Auth        | bcryptjs + session | Secure login and session control |
 
 ## 🖥️ Frontend Modularization
-- **Navigation and Footer**: Sidebar, top navigation bar, and footer are split into separate HTML files (sidebar.html, topnav.html, footer.html).
-- **Dynamic Loading**: These components are loaded into each page using JavaScript fetch, ensuring updates are reflected site-wide.
-- **Shared Layout**: All pages use a consistent Bootstrap-based layout, with shared containers and utility classes for spacing and overlap.
-- **Custom Utilities**: Custom CSS classes (e.g., mt-n-custom-6) extend Bootstrap for advanced layout control.
-- **Asset Management**: Static assets (images, CSS, JS) are organized under the public directory. External libraries are loaded via CDN or can be referenced locally.
+- Navigation and layout components are split into partials under `public/` (for example `sidebar.html`, `topnav.html`, `footer.html`) and are loaded into pages using client-side JavaScript utilities.
+- Static assets (images, CSS, JS) are organized under `public/assets`, `public/css`, and `public/js`.
+- The UI follows Bootstrap conventions and project-specific utility classes.
 
-## 🔄 Data Flow
-1. User submits login form via frontend
-2. Request sent to `/auth/login` route
-3. Backend validates credentials and starts session
-4. Session data stored in memory or external store
-5. Authenticated user gains access to protected routes
+## 🔄 Data Flow (accurate for this repo)
+1. User interacts with the frontend and submits a form or navigates to a page in `public/`.
+2. Form submissions and page handlers are PHP scripts under `public/` (for example `user-edit.php`, `transport-edit.php`).
+3. Those scripts call service classes in `services/` (e.g., `UserService.php`) for business logic and validation.
+4. Services use repository/data classes in `database/` (e.g., `UserData.php`, `Database.php`) to execute SQL against MySQL.
+5. Authentication uses PHP sessions (see `session_start()` in public pages) and `password_hash` / `password_verify` for passwords.
+6. Node/Express in `server.js` can serve static files, but the canonical start script (in `package.json`) launches the PHP built-in server (`php -S ... -t public`).
 
 ## 🛡️ Privilege Boundaries & Access Control
-- All sensitive backend operations (add, edit, delete) are protected by authentication and role-based access control (RBAC).
-- User roles and permissions are enforced in backend service layers (PHP/Node.js). Only authorized users can access or modify protected resources.
-- Privilege checks are performed before executing any business logic or database operation. Unauthorized access attempts are logged and denied.
-- Ensure that any new endpoints or features include explicit privilege checks and are documented here.
+- Sensitive operations (add/edit/delete) are enforced by server-side logic in PHP service layers and page handlers.
+- User session state and role checks are implemented in PHP (look for `session_start()` and service permission checks in `services/` and `public/*` scripts).
+- When adding new endpoints or features, enforce RBAC in the PHP service layer and log unauthorized attempts.
 
-## 📝 Auditability & Logging
-- All critical actions are logged for traceability and compliance. This includes:
-  - User logins and logouts
-  - Data creation, updates, and deletions (CRUD operations)
-  - Privilege escalations or permission changes
-  - Failed authentication or authorization attempts
-- Logs are stored in:
-  - Log files (e.g., `database/decedent-errors.log` for PHP errors and sensitive actions)
-  - Database tables (if implemented, e.g., `audit_log` for structured event tracking)
-- Error logging:
-  - All backend errors are logged with timestamps, user IDs (if available), and relevant context.
-  - PHP errors are typically logged to `decedent-errors.log` or the default PHP error log.
-  - Node.js errors are logged using a logger (e.g., `winston`) to a file or external service.
-- Reviewing audit trails:
-  - Log files can be accessed by administrators with server access.
-  - Database audit logs can be queried by privileged users or via admin interfaces.
-- Extending audit logging:
-  - When adding new features or endpoints, ensure all sensitive actions are logged with sufficient detail (who, what, when, where).
-  - Follow the existing logging pattern and update this documentation as needed.
-- Access to audit logs should be restricted to authorized administrators only, to protect sensitive information.
+## ## 📝 Auditability & Logging
+- Critical actions should be logged. The repository contains `database/decedent-errors.log` used for PHP error logging and traces.
+- PHP errors and application logs are the primary logging mechanism. There is no production Node.js logger configured in the repo (no `winston` usage detected).
+- Consider centralizing structured audit logs into a database table (e.g., `audit_log`) if required for compliance.
 
 ## 📄 Documentation Maintenance
-- This architecture document should be updated whenever the codebase or privilege model changes.
-- For major changes, consider adding or updating diagrams (sequence, flow, or component diagrams) to visually represent data flow and privilege boundaries.
+- Update this doc whenever the codebase changes (for example, if the project moves to a Node.js API backend or adds a centralized logging system).
+- Also update `docs/auth-flow.md` to reflect that authentication is implemented in PHP (if it currently describes Node/Express flows).
 
 ## 🗺️ System Architecture Diagram
 
-Below is a high-level diagram showing the main components, privilege boundaries, and data flow in DispatchBase:
+Below is a simplified diagram that reflects the actual structure and data flow in this repository:
 
 ```mermaid
 graph TD
@@ -71,38 +56,37 @@ graph TD
         A[Browser (HTML/JS/CSS)]
     end
     subgraph Public
-        B[public/ (Static Assets, Entry PHP)]
+        B[public/ (Entry PHP files, static assets)]
     end
     subgraph Backend
-        C[Node.js/Express (API, Auth)]
-        D[PHP Services (services/, includes/)]
+        D[PHP Services & Includes (services/, includes/)]
         E[Database Access (database/)]
     end
     F[(MySQL Database)]
+    subgraph Optional
+        C[Node.js/Express (server.js) - optional static server]
+    end
 
     A -- HTTP/HTTPS --> B
-    B -- API/Data Requests --> C
-    B -- Form Submits --> D
-    C -- Auth/API Calls --> D
+    B -- Form Submits / Page Requests --> D
     D -- Queries --> E
     E -- SQL --> F
-    C -- Session/Auth --> C
-    D -- Session/Auth --> D
+    A -- Static Asset Requests --> C
+    C -- Serves Static Files --> A
 
     classDef privBoundary fill:#f9f,stroke:#333,stroke-width:2px;
-    class C,D privBoundary;
-
-    %% Privilege boundary annotation
-    classDef boundaryLine stroke-dasharray: 5 5;
-    C -. Enforces RBAC .-> D
+    class D,E privBoundary;
 ```
 
-- **Purple boxes** indicate layers where privilege boundaries and access control are enforced.
-- Data flows from the browser to the backend via both Node.js and PHP, with authentication and authorization checks at each backend layer.
-- All sensitive operations and data access are protected by RBAC and audit logging.
+- The PHP layer (services/includes/database) is the authoritative backend for business logic, authentication, and data access.
+- The Node/Express server is optional and can be used during development to serve static content, but the project's `package.json` start script uses PHP's built-in server to host `public/`.
 
-## 🧠 Notes
-- Modular folder structure for scalability
-- Future-proofing for JWT or Redis session store
-- Compatible with Docker and CI/CD pipelines
-- Frontend components and layout are now fully modular and maintainable
+## 🧠 Notes & Actionable Items
+- Action: Update `docs/auth-flow.md` to describe the PHP session and `password_hash` flow rather than Node/Express `express-session`/`bcryptjs` (this repo currently uses PHP for auth).
+- Security: Confirm no sensitive PHP files are inside `public/` other than intended entry scripts. The repo already follows the guideline of keeping database access classes under `database/` (outside `public/`).
+- Deployment: The `package.json` start script opens `http://localhost:8000/index.php` and runs `php -S localhost:8000 -t public` — use that for local testing. `server.js` can be used as an alternate static server but will not execute PHP without a PHP runtime.
+
+
+---
+
+_Last reviewed: 2025-10-22_
