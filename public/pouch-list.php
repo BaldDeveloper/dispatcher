@@ -94,7 +94,7 @@ $totalPages = $pageSize > 0 ? (int)ceil($totalPouches / $pageSize) : 1;
                                         <tbody>
                                         <?php foreach ($pouches as $pouch): ?>
                                             <tr>
-                                                <td><a href="pouch-edit.php?mode=edit&id=<?= urlencode($pouch['pouch_id']) ?>"><?= htmlspecialchars($pouch['pouch_id']) ?></a></td>
+                                                <td><a href="pouch-edit.php?mode=edit&id=<?= urlencode($pouch['id']) ?>"><?= htmlspecialchars($pouch['id']) ?></a></td>
                                                 <td><?= htmlspecialchars($pouch['pouch_type'] ?? '') ?></td>
                                             </tr>
                                         <?php endforeach; ?>

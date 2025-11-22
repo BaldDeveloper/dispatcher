@@ -156,3 +156,58 @@ function validate_transport_charges_fields(array $input): array {
     // Optional: verify total if provided. This function only validates components; caller may recalculate total server-side.
     return $errors;
 }
+
+/**
+ * Validate transport form fields (required checks and time ordering).
+ * Sets per-field error flags in $fieldErrors and per-time messages in $timeErrors.
+ * Returns an empty string on success or a global error message when required fields are missing.
+ *
+ * @param array $fields
+ * @param array $fieldErrors (by reference) associative array of field => bool
+ * @param array $timeErrors (by reference) associative array of timeField => message
+ * @return string global error message or empty string
+ */
+function validate_transport_fields(array $fields, array & $fieldErrors, array & $timeErrors): string {
+    $missing = [];
+    $required = [
+        'customer_id',
+        'firm_date',
+        'account_type',
+        'origin_location',
+        'destination_location',
+        'coroner',
+        'pouch_type',
+        'primary_transporter'
+    ];
+
+    foreach ($required as $req) {
+        if (!isset($fields[$req]) || trim((string)$fields[$req]) === '') {
+            $fieldErrors[$req] = true;
+            $missing[] = $req;
+        }
+    }
+
+    // Time fields required
+    $timeFields = ['call_time', 'arrival_time', 'departure_time', 'delivery_time'];
+    foreach ($timeFields as $t) {
+        if (!isset($fields[$t]) || trim((string)$fields[$t]) === '') {
+            $fieldErrors[$t] = true;
+            $missing[] = $t;
+        }
+    }
+
+    // Chronological order validation (only if values present)
+    $timeErrors = validate_transport_times(
+        $fields['call_time'] ?? '',
+        $fields['departure_time'] ?? '',
+        $fields['arrival_time'] ?? '',
+        $fields['delivery_time'] ?? ''
+    );
+
+    // Mark any time-related fields as invalid if they have messages
+    foreach ($timeErrors as $key => $msg) {
+        $fieldErrors[$key] = true;
+    }
+
+    return empty($missing) ? '' : 'Please fill in all required fields.';
+}

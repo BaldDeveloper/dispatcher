@@ -41,7 +41,7 @@ foreach ($allLocations as $loc) {
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Transport List - DispatchBase</title>
+    <title>Dispatch List - DispatchBase</title>
     <link href="css/styles.css" rel="stylesheet" />
     <link rel="icon" type="image/x-icon" href="assets/img/favicon.png" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -67,7 +67,7 @@ foreach ($allLocations as $loc) {
             <div class="container-xl px-4 mt-n-custom-6">
                 <div id="default">
                     <div class="card mb-4 w-100">
-                        <div class="card-header">Transport Entries</div>
+                        <div class="card-header">Dispatch Entries</div>
                         <div class="card-body">
                             <div class="dataTables_wrapper dt-bootstrap5">
                                 <div class="row mb-3">
@@ -97,7 +97,7 @@ foreach ($allLocations as $loc) {
                                     <table class="table table-bordered table-hover mb-0">
                                         <thead class="table-light">
                                         <tr>
-                                            <th>Transport ID</th>
+                                            <th>ID</th>
                                             <th>Date</th>
                                             <th>Firm ID</th>
                                             <th>From</th>
@@ -110,8 +110,8 @@ foreach ($allLocations as $loc) {
                                         </thead>
                                         <tbody>
                                         <?php foreach ($transports as $t): ?>
-                                            <tr>
-                                                <td><a href="transport-edit.php?mode=edit&id=<?= urlencode($t['transport_id']) ?>"><?= htmlspecialchars($t['transport_id']) ?></a></td>
+                                             <tr>
+                                                <td><a href="transport-edit.php?mode=edit&id=<?= urlencode($t['id'] ?? '') ?>"><?= htmlspecialchars($t['id'] ?? '') ?></a></td>
                                                 <td><?= htmlspecialchars($t['firm_date'] ?? '') ?></td>
                                                 <td><?= htmlspecialchars($t['customer_id'] ?? '') ?></td>
                                                 <td><?= htmlspecialchars($locationNames[$t['origin_location']] ?? 'Unknown') ?></td>
@@ -124,23 +124,23 @@ foreach ($allLocations as $loc) {
                                         <?php endforeach; ?>
                                         <?php if (empty($transports)): ?>
                                             <tr>
-                                                <td colspan="9" class="text-danger">No transport logs found.</td>
+                                                <td colspan="9" class="text-danger">No dispatch logs found.</td>
                                             </tr>
                                         <?php endif; ?>
                                         </tbody>
                                     </table>
                                 </div>
                                 <div class="mt-3">
-                                    <nav aria-label="Transport list pagination" class="mt-3">
-                                        <ul class="pagination justify-content-center">
-                                            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-                                                <li class="page-item<?= $i == $page ? ' active' : '' ?>">
-                                                    <a class="page-link" href="?page=<?= $i ?>&pageSize=<?= $pageSize ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
-                                                </li>
-                                            <?php endfor; ?>
-                                        </ul>
-                                    </nav>
-                                </div>
+                                    <nav aria-label="Dispatch list pagination" class="mt-3">
+                                         <ul class="pagination justify-content-center">
+                                             <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                                                 <li class="page-item<?= $i == $page ? ' active' : '' ?>">
+                                                     <a class="page-link" href="?page=<?= $i ?>&pageSize=<?= $pageSize ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
+                                                 </li>
+                                             <?php endfor; ?>
+                                         </ul>
+                                     </nav>
+                                 </div>
                             </div>
                         </div>
                     </div>

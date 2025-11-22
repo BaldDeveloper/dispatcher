@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once __DIR__ . '/../database/Database.php';
 require_once __DIR__ . '/../services/PouchService.php';
 require_once __DIR__ . '/../includes/validation.php';
@@ -52,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_pouch']) && $m
             // Prevent duplicate pouch_type on add
             $existing = $pouchService->findByType($pouch_type);
             if (($mode === 'add' && $existing) ||
-                ($mode === 'edit' && $existing && $existing['pouch_id'] != $id)) {
+                ($mode === 'edit' && $existing && ($existing['id'] != $id))) {
                 $error = 'A pouch with this type already exists.';
             } else {
                 try {
@@ -127,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_pouch']) && $m
                         <?php endif; ?>
                         <?php if ($success !== 'deleted'): ?>
                             <form method="POST">
-                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(generate_csrf_token()) ?>">
+                                <?php csrf_token_field(); ?>
                                 <div class="mb-3">
                                     <label for="pouch_type" class="form-label required">Pouch Type</label>
                                     <input type="text" class="form-control<?= $fieldErrors['pouch_type'] ? ' is-invalid' : '' ?>" id="pouch_type" name="pouch_type" value="<?= htmlspecialchars($pouch_type ?? '') ?>" required maxlength="100" aria-invalid="<?= $fieldErrors['pouch_type'] ? 'true' : 'false' ?>">

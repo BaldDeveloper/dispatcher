@@ -1,6 +1,6 @@
 <?php
 // DecedentService.php
-// Service class for decedent-related business logic
+// Service class for decedents-related business logic
 
 require_once __DIR__ . '/../database/DecedentData.php';
 require_once __DIR__ . '/../database/Database.php';
@@ -9,7 +9,7 @@ require_once __DIR__ . '/../includes/validation.php';
 /**
  * DecedentService
  *
- * Service class for decedent-related business logic.
+ * Service class for decedents-related business logic.
  *
  * Methods in this class handle business rules, formatting, and validation
  * that are not strictly data access (which remains in DecedentData).
@@ -31,7 +31,7 @@ class DecedentService {
     }
 
     /**
-     * Get all decedents.
+     * Get all decedents (table: decedents).
      * @return array
      */
     public function getAll() {
@@ -39,7 +39,7 @@ class DecedentService {
     }
 
     /**
-     * Find a decedent by ID.
+     * Find a decedent by ID (table: decedents).
      * @param int|string $decedent_id
      * @return array|null
      */
@@ -48,7 +48,7 @@ class DecedentService {
     }
 
     /**
-     * Update a decedent by ID, with validation.
+     * Update a decedent by ID, with validation (table: decedents).
      * @param int $decedent_id
      * @param string $first_name
      * @param string $last_name
@@ -64,20 +64,20 @@ class DecedentService {
     }
 
     /**
-     * Update a decedent by transport ID.
-     * @param int $transport_id
+     * Update a decedent by dispatch ID (table: decedents).
+     * @param int $id
      * @param string $first_name
      * @param string $last_name
      * @param string $ethnicity
      * @param string $gender
      * @return int
      */
-    public function updateByTransportId($transport_id, $first_name, $last_name, $ethnicity, $gender) {
-        return $this->repo->updateByTransportId($transport_id, $first_name, $last_name, $ethnicity, $gender);
+    public function updateByTransportId($id, $first_name, $last_name, $ethnicity, $gender) {
+        return $this->repo->updateByTransportId($id, $first_name, $last_name, $ethnicity, $gender);
     }
 
     /**
-     * Delete a decedent by ID.
+     * Delete a decedent by ID (table: decedents).
      * @param int $decedent_id
      * @return int
      */
@@ -86,24 +86,24 @@ class DecedentService {
     }
 
     /**
-     * Delete a decedent by transport ID.
-     * @param int $transport_id
+     * Delete a decedent by dispatch ID (table: decedents).
+     * @param int $id
      * @return int
      */
-    public function deleteByTransportId($transport_id) {
-        return $this->repo->deleteByTransportId($transport_id);
+    public function deleteByTransportId($id) {
+        return $this->repo->deleteByTransportId($id);
     }
 
     /**
-     * Insert a decedent by transport ID.
-     * @param int $transport_id
+     * Insert a decedent by dispatch ID (table: decedents).
+     * @param int $id
      * @param string $first_name
      * @param string $last_name
      * @param string $ethnicity
      * @param string $gender
      * @return int
      */
-    public function insertByTransportId($transport_id, $first_name, $last_name, $ethnicity, $gender) {
-        return $this->repo->insertByTransportId($transport_id, $first_name, $last_name, $ethnicity, $gender);
+    public function insertByTransportId($id, $first_name, $last_name, $ethnicity, $gender) {
+        return $this->repo->insertByTransportId($id, $first_name, $last_name, $ethnicity, $gender);
     }
 }

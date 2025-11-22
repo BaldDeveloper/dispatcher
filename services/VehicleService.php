@@ -35,7 +35,7 @@ class VehicleService {
         return $this->vehicleData->delete($id);
     }
 }
-<?php
+
 /**
  * VehicleData.php
  * Data access layer for the vehicle table.
@@ -47,12 +47,12 @@ class VehicleData {
     }
 
     public function getCount() {
-        $stmt = $this->db->getConnection()->query('SELECT COUNT(*) FROM vehicle');
+        $stmt = $this->db->getConnection()->query('SELECT COUNT(*) FROM vehicles');
         return (int)$stmt->fetchColumn();
     }
 
     public function getPage($offset, $limit) {
-        $stmt = $this->db->getConnection()->prepare('SELECT * FROM vehicle ORDER BY vehicle_id DESC LIMIT :limit OFFSET :offset');
+        $stmt = $this->db->getConnection()->prepare('SELECT * FROM vehicles ORDER BY id DESC LIMIT :limit OFFSET :offset');
         $stmt->bindValue(':limit', (int)$limit, \PDO::PARAM_INT);
         $stmt->bindValue(':offset', (int)$offset, \PDO::PARAM_INT);
         $stmt->execute();
@@ -60,14 +60,14 @@ class VehicleData {
     }
 
     public function findById($id) {
-        $stmt = $this->db->getConnection()->prepare('SELECT * FROM vehicle WHERE vehicle_id = :id');
+        $stmt = $this->db->getConnection()->prepare('SELECT * FROM vehicles WHERE id = :id');
         $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetch();
     }
 
     public function create($data) {
-        $sql = 'INSERT INTO vehicle (
+        $sql = 'INSERT INTO vehicles (
             license_plate, vehicle_type, make, model, year_of_manufacture, vin, color, fuel_type, odometer_reading, odometer_unit, service_interval, last_service_date, next_service_date, maintenance_status, assigned_mechanic, tire_condition, battery_health, current_status, registration_expiry, insurance_provider, insurance_policy_number, insurance_expiry, emission_cert_status, inspection_notes, trailer_compatible, refrigeration_unit, notes
         ) VALUES (
             :license_plate, :vehicle_type, :make, :model, :year_of_manufacture, :vin, :color, :fuel_type, :odometer_reading, :odometer_unit, :service_interval, :last_service_date, :next_service_date, :maintenance_status, :assigned_mechanic, :tire_condition, :battery_health, :current_status, :registration_expiry, :insurance_provider, :insurance_policy_number, :insurance_expiry, :emission_cert_status, :inspection_notes, :trailer_compatible, :refrigeration_unit, :notes
@@ -78,7 +78,7 @@ class VehicleData {
     }
 
     public function update($id, $data) {
-        $sql = 'UPDATE vehicle SET
+        $sql = 'UPDATE vehicles SET
             license_plate = :license_plate,
             vehicle_type = :vehicle_type,
             make = :make,
@@ -106,16 +106,15 @@ class VehicleData {
             trailer_compatible = :trailer_compatible,
             refrigeration_unit = :refrigeration_unit,
             notes = :notes
-        WHERE vehicle_id = :vehicle_id';
-        $data['vehicle_id'] = $id;
+        WHERE id = :id';
+        $data['id'] = $id;
         $stmt = $this->db->getConnection()->prepare($sql);
         return $stmt->execute($data);
     }
 
     public function delete($id) {
-        $stmt = $this->db->getConnection()->prepare('DELETE FROM vehicle WHERE vehicle_id = :id');
+        $stmt = $this->db->getConnection()->prepare('DELETE FROM vehicles WHERE id = :id');
         $stmt->bindValue(':id', $id, \PDO::PARAM_INT);
         return $stmt->execute();
     }
 }
-

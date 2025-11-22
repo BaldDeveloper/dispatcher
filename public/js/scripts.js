@@ -19,20 +19,26 @@
 }
 
 window.addEventListener('DOMContentLoaded', event => {
-    // Activate feather
-    feather.replace();
+    // Activate feather (guard if library not loaded)
+    if (window.feather && typeof feather.replace === 'function') {
+        feather.replace();
+    }
 
-    // Enable tooltips globally
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+    // Enable tooltips globally (guard if Bootstrap JS not loaded)
+    if (window.bootstrap && typeof bootstrap.Tooltip === 'function') {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
 
-    // Enable popovers globally
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl);
-    });
+    // Enable popovers globally (guard if Bootstrap JS not loaded)
+    if (window.bootstrap && typeof bootstrap.Popover === 'function') {
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl);
+        });
+    }
 
     // Initialize sidebar toggle (for static pages)
     initSidebarToggle();
@@ -70,8 +76,10 @@ window.addEventListener('DOMContentLoaded', event => {
                 const parentNavLink = document.body.querySelector(
                     '[data-bs-target="#' + parentNode.id + '"]'
                 );
-                parentNavLink.classList.remove('collapsed');
-                parentNavLink.classList.add('active');
+                if (parentNavLink) {
+                    parentNavLink.classList.remove('collapsed');
+                    parentNavLink.classList.add('active');
+                }
             }
             parentNode = parentNode.parentNode;
         }

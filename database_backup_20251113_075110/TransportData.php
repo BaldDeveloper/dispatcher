@@ -3,37 +3,9 @@ require_once __DIR__ . '/Database.php';
 
 class TransportData {
     private Database $db;
-    // updated default primary key name to `id`
-    private string $pkColumn = 'id';
 
     public function __construct(Database $db) {
         $this->db = $db;
-        $this->detectPrimaryColumn();
-    }
-
-    // Try to detect the primary key column for transport table (transport_id or id)
-    private function detectPrimaryColumn(): void {
-        try {
-            // table name changed from `transport` -> `dispatches`
-            $cols = $this->db->query("SHOW COLUMNS FROM dispatches");
-            // prefer `id` as the primary key; legacy `transportid` kept as fallback
-            $candidates = ['id', 'transportid'];
-            foreach ($cols as $col) {
-                $field = $col['Field'] ?? $col['field'] ?? null;
-                if (!$field) continue;
-                $lf = strtolower($field);
-                foreach ($candidates as $cand) {
-                    if ($lf === strtolower($cand)) {
-                        $this->pkColumn = $field;
-                        return;
-                    }
-                }
-            }
-            // If nothing found, keep default and log
-            error_log('[TransportData::detectPrimaryColumn] No known PK column found, defaulting to id. Columns: ' . json_encode($cols));
-        } catch (Exception $e) {
-            error_log('[TransportData::detectPrimaryColumn] Exception: ' . $e->getMessage());
-        }
     }
 
     // Insert a new record into transport
@@ -57,8 +29,7 @@ class TransportData {
         ?float $mileage_rate = null,
         ?float $mileage_total_charge = null
     ): int {
-        // updated table name to `dispatches`
-        $sql = "INSERT INTO dispatches (
+        $sql = "INSERT INTO transport (
             customer_id, firm_date, account_type, origin_location, destination_location, coroner_name, pouch_type, transit_permit_number, tag_number, call_time, arrival_time, departure_time, delivery_time, primary_transporter, assistant_transporter, mileage, mileage_rate, mileage_total_charge
         ) VALUES (
             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
@@ -95,22 +66,22 @@ class TransportData {
     }
 
     public function getAll(): array {
-        // alias primary key to transport_id for UI compatibility
-        $pk = $this->pkColumn;
-        // alias primary key to `id` (replacing transport_id)
-        $sql = "SELECT t.*, t.`$pk` AS id FROM dispatches t ORDER BY t.`$pk` DESC";
+        // Join transport with decedents to get first and last name
+        $sql = "SELECT t.*, d.first_name AS decedent_first_name, d.last_name AS decedent_last_name
+                FROM transport t
+                LEFT JOIN decedents d ON t.transport_id = d.transport_id
+                ORDER BY t.transport_id DESC";
         return $this->db->query($sql);
     }
 
     public function findById(int $id): ?array {
-        $pk = $this->pkColumn;
-        $result = $this->db->query("SELECT t.*, t.`$pk` AS id FROM dispatches t WHERE t.`$pk` = ?", [$id]);
+        $result = $this->db->query("SELECT * FROM transport WHERE transport_id = ?", [$id]);
         return $result[0] ?? null;
     }
 
     // Update an existing record in transport
     public function update(
-        int $id,
+        int $transportId,
         int $customerId,
         string $firmDate,
         string $accountType,
@@ -130,9 +101,7 @@ class TransportData {
         ?float $mileage_rate = null,
         ?float $mileage_total_charge = null
     ): int {
-        $pk = $this->pkColumn;
-        // updated table name to `dispatches`
-        $sql = "UPDATE dispatches SET
+        $sql = "UPDATE transport SET
             customer_id = ?,
             firm_date = ?,
             account_type = ?,
@@ -151,7 +120,7 @@ class TransportData {
             mileage = ?,
             mileage_rate = ?,
             mileage_total_charge = ?
-            WHERE `$pk` = ?";
+            WHERE transport_id = ?";
         $params = [
             $customerId,
             $firmDate,
@@ -171,32 +140,30 @@ class TransportData {
             $mileage,
             $mileage_rate,
             $mileage_total_charge,
-            $id
+            $transportId
         ];
-        error_log('update called for id ' . $id . ' with tag_number: ' . (isset($params[8]) ? $params[8] : 'NOT SET'));
-        error_log('update SQL: ' . $sql);
-        error_log('update params: ' . json_encode($params));
+        error_log('updateTransport called for id ' . $transportId . ' with tag_number: ' . (isset($params[8]) ? $params[8] : 'NOT SET'));
+        error_log('updateTransport SQL: ' . $sql);
+        error_log('updateTransport params: ' . json_encode($params));
         try {
             $result = $this->db->execute($sql, $params);
             if (!$result) {
-                error_log('SQL update failed: ' . $sql . ' Params: ' . json_encode($params));
+                error_log('SQL updateTransport failed: ' . $sql . ' Params: ' . json_encode($params));
             }
             return $result;
         } catch (Exception $e) {
-            error_log('Exception in update: ' . $e->getMessage());
+            error_log('Exception in updateTransport: ' . $e->getMessage());
             return false;
         }
     }
 
-    public function delete(int $id): int {
-        $pk = $this->pkColumn;
-        $sql = "DELETE FROM dispatches WHERE `$pk` = ?";
-        return $this->db->execute($sql, [$id]);
+    public function delete(int $transport_id): int {
+        $sql = "DELETE FROM transport WHERE transport_id = ?";
+        return $this->db->execute($sql, [$transport_id]);
     }
 
     public function getCount(): int {
-        $pk = $this->pkColumn;
-        $sql = "SELECT COUNT(*) AS cnt FROM dispatches";
+        $sql = "SELECT COUNT(*) AS cnt FROM transport";
         $result = $this->db->query($sql);
         return isset($result[0]['cnt']) ? (int)$result[0]['cnt'] : 0;
     }
@@ -204,18 +171,18 @@ class TransportData {
     public function getPaginated(int $pageSize, int $offset): array {
         $pageSize = max(1, (int)$pageSize);
         $offset = max(0, (int)$offset);
-        $pk = $this->pkColumn;
-        $sql = "SELECT t.*, t.`$pk` AS id FROM dispatches t ORDER BY t.`$pk` DESC LIMIT $pageSize OFFSET $offset";
+        $sql = "SELECT t.*, d.first_name AS decedent_first_name, d.last_name AS decedent_last_name
+                FROM transport t
+                LEFT JOIN decedents d ON t.transport_id = d.transport_id
+                ORDER BY t.transport_id DESC
+                LIMIT $pageSize OFFSET $offset";
         return $this->db->query($sql);
     }
 
     // Returns the total number of transports matching a search term
     public function getCountBySearch(string $search): int {
         $like = '%' . strtolower($search) . '%';
-        // Search only transport columns and decedent names via subquery to avoid joining on unknown column
-        $pk = $this->pkColumn;
-        $sql = "SELECT COUNT(*) as cnt FROM dispatches t WHERE (LOWER(t.origin_location) LIKE ? OR LOWER(t.destination_location) LIKE ?)
-                OR EXISTS (SELECT 1 FROM decedents d WHERE d.`$pk` = t.`$pk` AND (LOWER(d.first_name) LIKE ? OR LOWER(d.last_name) LIKE ?))";
+        $sql = "SELECT COUNT(*) as cnt FROM transport t LEFT JOIN decedents d ON t.transport_id = d.transport_id WHERE (LOWER(t.origin_location) LIKE ? OR LOWER(t.destination_location) LIKE ?) OR (LOWER(d.first_name) LIKE ? OR LOWER(d.last_name) LIKE ?)";
         error_log('[getCountBySearch] SQL: ' . $sql);
         error_log('[getCountBySearch] PARAMS: ' . json_encode([$like, $like, $like, $like]));
         $result = $this->db->query(
@@ -230,8 +197,7 @@ class TransportData {
         $limit = max(1, (int)$limit);
         $offset = max(0, (int)$offset);
         $like = '%' . strtolower($search) . '%';
-        $pk = $this->pkColumn;
-        $sql = "SELECT t.*, t.`$pk` AS id FROM dispatches t WHERE (LOWER(t.origin_location) LIKE ? OR LOWER(t.destination_location) LIKE ?) OR EXISTS (SELECT 1 FROM decedents d WHERE d.`$pk` = t.`$pk` AND (LOWER(d.first_name) LIKE ? OR LOWER(d.last_name) LIKE ?)) ORDER BY t.`$pk` DESC LIMIT $limit OFFSET $offset";
+        $sql = "SELECT t.*, d.first_name AS decedent_first_name, d.last_name AS decedent_last_name FROM transport t LEFT JOIN decedents d ON t.transport_id = d.transport_id WHERE (LOWER(t.origin_location) LIKE ? OR LOWER(t.destination_location) LIKE ?) OR (LOWER(d.first_name) LIKE ? OR LOWER(d.last_name) LIKE ?) ORDER BY t.transport_id DESC LIMIT $limit OFFSET $offset";
         error_log('[searchPaginated] SQL: ' . $sql);
         error_log('[searchPaginated] PARAMS: ' . json_encode([$like, $like, $like, $like]));
         return $this->db->query($sql, [$like, $like, $like, $like]);

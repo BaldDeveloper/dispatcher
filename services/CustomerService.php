@@ -36,16 +36,16 @@ class CustomerService {
     }
 
     /**
-     * Find a customer by customer_number (ID).
+     * Find a customer by id.
      * @param int|string $id
      * @return array|null
      */
-    public function findByCustomerNumber($id) {
-        return $this->repo->findByCustomerNumber($id);
+    public function findById($id) {
+        return $this->repo->findById($id);
     }
 
     /**
-     * Delete a customer by customer_number (ID).
+     * Delete a customer by id.
      * @param int|string $id
      * @return bool|int
      */

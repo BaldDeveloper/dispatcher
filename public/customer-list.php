@@ -47,7 +47,7 @@ header('Expires: 0');
 $headers = ['ID', 'Company Name', 'Email', 'City', 'State', 'Phone'];
 $rows = array_map(function($c) {
     return [
-        'ID' => '<a href="customer-edit.php?mode=edit&id=' . htmlspecialchars($c['customer_number'] ?? '') . '" class="text-primary">' . htmlspecialchars($c['customer_number'] ?? '') . '</a>',
+        'ID' => '<a href="customer-edit.php?mode=edit&id=' . htmlspecialchars($c['id'] ?? '') . '" class="text-primary">' . htmlspecialchars($c['id'] ?? '') . '</a>',
         'Company Name' => htmlspecialchars($c['company_name'] ?? ''),
         'Email' => htmlspecialchars($c['email_address'] ?? ''),
         'City' => htmlspecialchars($c['city'] ?? ''),

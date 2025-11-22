@@ -38,45 +38,23 @@ class Database {
 
     // Generic query executor
     public function query(string $sql, array $params = []): array {
-        $log_file = __DIR__ . '/db_error.log';
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            return $stmt->fetchAll();
-        } catch (PDOException $e) {
-            // Log the SQL error with params for debugging and return empty array to avoid fatal error
-            $msg = '[' . date('Y-m-d H:i:s') . '] PDOException in query: ' . $e->getMessage() . "\nSQL: " . $sql . "\nParams: " . json_encode($params) . "\n";
-            file_put_contents($log_file, $msg, FILE_APPEND);
-            return [];
-        }
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
     }
 
     // Insert with auto-increment ID return
     public function insert(string $sql, array $params): int {
-        $log_file = __DIR__ . '/db_error.log';
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            return (int)$this->pdo->lastInsertId();
-        } catch (PDOException $e) {
-            $msg = '[' . date('Y-m-d H:i:s') . '] PDOException in insert: ' . $e->getMessage() . "\nSQL: " . $sql . "\nParams: " . json_encode($params) . "\n";
-            file_put_contents($log_file, $msg, FILE_APPEND);
-            return 0;
-        }
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return (int)$this->pdo->lastInsertId();
     }
 
     // Update or delete
     public function execute(string $sql, array $params): int {
-        $log_file = __DIR__ . '/db_error.log';
-        try {
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute($params);
-            return $stmt->rowCount();
-        } catch (PDOException $e) {
-            $msg = '[' . date('Y-m-d H:i:s') . '] PDOException in execute: ' . $e->getMessage() . "\nSQL: " . $sql . "\nParams: " . json_encode($params) . "\n";
-            file_put_contents($log_file, $msg, FILE_APPEND);
-            return 0;
-        }
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->rowCount();
     }
 
     // Transaction support

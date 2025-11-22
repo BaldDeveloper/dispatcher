@@ -28,9 +28,9 @@ require_once __DIR__ . '/../includes/account_types.php';
                     <select class="form-control" id="customer_id" name="customer_id" required>
                         <option value="">Select Firm</option>
                         <?php foreach ($customers as $customer): ?>
-                            <option value="<?= htmlspecialchars($customer['customer_number']) ?>" <?= ($customerId == $customer['customer_number']) ? 'selected' : '' ?>>
+                            <option value="<?= htmlspecialchars($customer['id']) ?>" <?= ($customerId == $customer['id']) ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($customer['company_name']) ?>
-                                (<?= htmlspecialchars($customer['customer_number']) ?>)
+                                (<?= htmlspecialchars($customer['id']) ?>)
                             </option>
                         <?php endforeach; ?>
                     </select>

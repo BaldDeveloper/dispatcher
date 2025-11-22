@@ -1,4 +1,5 @@
 <?php
+session_start();
 /**
  * User Edit Page
  *

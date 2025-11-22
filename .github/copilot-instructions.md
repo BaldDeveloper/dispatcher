@@ -32,6 +32,16 @@
 
 ---
 
+## Page template and common assets
+
+- All new public pages (files under `/public/`) must include the site's shared layout elements by loading the partials and containers used across the app: `#topnav` (top navigation), `#layoutSidenav_nav` (sidebar/navigation), and `#footer` (footer). These are typically populated via client-side `fetch()` calls that load `topnav.html`, `sidebar.html` (or `sidebar.php`), and `footer.html` into those containers.
+- All public pages that render forms must call `session_start()` before accessing session data and must include CSRF protection. Follow the existing helpers in `/includes/csrf.php`: include or require that file, render the token in forms with `csrf_token_field()` (or output `generate_csrf_token()` into a hidden `csrf_token` field), and validate POSTs with `validate_csrf_token($_POST['csrf_token'] ?? '')`.
+- Do not rely on inline styles in page markup. All visual styles should be defined in `/public/css/styles.css` (or additional files under `/public/css/`) and referenced from pages via `<link href="css/styles.css" rel="stylesheet">` so styling stays centralized and consistent.
+- Common client-side validation and utilities must live under `/public/js/`. Examples: `phone-format.js` for telephone formatting/validation, `form-utils.js` for shared form helpers, and `scripts.js` for global behaviour. Pages should include these shared JS files rather than copy/pasting validation logic into individual pages.
+- When adding page-specific JavaScript or CSS, prefer creating a separate file under `/public/js/` or `/public/css/` and reference it from the page; avoid inline `<script>` or `<style>` blocks unless tiny and unavoidable.
+
+---
+
 ## Centralized Validation Logic
 - All server-side validation logic (e.g., email, phone number) must be placed in `/includes/validation.php`.
 - Use the constants defined in `validation.php` (e.g., `EMAIL_PATTERN`, `PHONE_PATTERN`) for HTML `pattern` attributes in forms. Reference these constants directly in the form markup to ensure consistency between client and server validation.
@@ -79,7 +89,6 @@
 ---
 
 ## PHP Coding Standards
-
 - Always define global/shared variables at the top of each PHP file to avoid undefined variable warnings and improve code clarity. For variables only used in a specific scope, define them near their usage.
 - Follow consistent naming conventions for variables, functions, and classes.
 - Use meaningful and descriptive names for all identifiers.

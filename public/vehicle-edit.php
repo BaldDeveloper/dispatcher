@@ -10,6 +10,8 @@
  * - Role-based access control can be added if needed
  */
 
+session_start();
+
 require_once __DIR__ . '/../database/Database.php';
 require_once __DIR__ . '/../database/VehicleData.php';
 require_once __DIR__ . '/../includes/csrf.php';
@@ -35,7 +37,7 @@ $firstMissingField = null;
  */
 function reset_vehicle_fields() {
     return [
-        'vehicle_id' => '',
+        'id' => '',
         'vehicle_type' => '',
         'color' => '',
         'license_plate' => '',
@@ -70,7 +72,7 @@ function reset_vehicle_fields() {
  */
 function populate_vehicle_fields_from_db($vehicle) {
     return [
-        'vehicle_id' => $vehicle['vehicle_id'] ?? '',
+        'id' => $vehicle['id'] ?? '',
         'vehicle_type' => $vehicle['vehicle_type'] ?? '',
         'color' => $vehicle['color'] ?? '',
         'license_plate' => $vehicle['license_plate'] ?? '',
@@ -118,7 +120,10 @@ function load_vehicle_fields($id) {
 
 // Use the function to initialize fields
 $fields = reset_vehicle_fields();
+// Preserve requested id across extract
+$__requestedId = $id;
 extract($fields);
+$id = $__requestedId;
 
 // After POST, validate using centralized function only
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -167,8 +172,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $mode === 'add') {
 }
 // Populate fields if editing and not submitting form
 if ($mode === 'edit' && $id && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Preserve requested id across extract
+    $__requestedId = $id;
     $fields = load_vehicle_fields($id);
     extract($fields);
+    $id = $__requestedId;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $mode === 'edit' && $id) {

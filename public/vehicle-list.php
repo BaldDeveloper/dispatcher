@@ -87,7 +87,7 @@ $totalPages = $totalVehicles > 0 ? (int)ceil($totalVehicles / $pageSize) : 1;
                                 <?php else: ?>
                                     <?php foreach ($vehicles as $vehicle): ?>
                                         <tr>
-                                            <td><a href="vehicle-edit.php?id=<?= urlencode($vehicle['vehicle_id']) ?>&mode=edit"><?= htmlspecialchars($vehicle['vehicle_id']) ?></a></td>
+                                            <td><a href="vehicle-edit.php?id=<?= urlencode($vehicle['id']) ?>&mode=edit"><?= htmlspecialchars($vehicle['id']) ?></a></td>
                                             <td><?= htmlspecialchars($vehicle['year']) ?></td>
                                             <td><?= htmlspecialchars($vehicle['make']) ?></td>
                                             <td><?= htmlspecialchars($vehicle['model']) ?></td>

@@ -1,11 +1,11 @@
 <?php
 /**
- * TransportChargesData.php
- * Data access for transport_charges table
+ * BaseRatesData.php
+ * Data access for `base_rates` table
  */
 require_once __DIR__ . '/Database.php';
 
-class TransportChargesData {
+class BaseRatesData {
     private Database $db;
 
     public function __construct(Database $db) {
@@ -13,7 +13,7 @@ class TransportChargesData {
     }
 
     /**
-     * Create a new transport_charges record
+     * Create a new base_rates record
      */
     public function create(
         int $transport_id,
@@ -32,7 +32,7 @@ class TransportChargesData {
         ?string $other_charge_4_description,
         float $total_charge
     ): int {
-        $sql = "INSERT INTO transport_charges (
+        $sql = "INSERT INTO base_rates (
             transport_id, removal_charge, pouch_charge, transport_fees, wait_charge, mileage_fees,
             other_charge_1, other_charge_1_description, other_charge_2, other_charge_2_description, other_charge_3, other_charge_3_description,
             other_charge_4, other_charge_4_description, total_charge
@@ -60,7 +60,7 @@ class TransportChargesData {
     }
 
     /**
-     * Update an existing transport_charges record
+     * Update an existing base_rates record
      */
     public function update(
         int $id,
@@ -80,7 +80,7 @@ class TransportChargesData {
         ?string $other_charge_4_description,
         float $total_charge
     ): bool {
-        $sql = "UPDATE transport_charges SET
+        $sql = "UPDATE base_rates SET
             transport_id = ?,
             removal_charge = ?,
             pouch_charge = ?,
@@ -119,10 +119,10 @@ class TransportChargesData {
     }
 
     /**
-     * Delete a transport_charges record by id
+     * Delete a base_rates record by id
      */
     public function delete(int $id): bool {
-        $sql = "DELETE FROM transport_charges WHERE id = ?";
+        $sql = "DELETE FROM base_rates WHERE id = ?";
         return (bool)$this->db->execute($sql, [$id]);
     }
 
@@ -130,7 +130,7 @@ class TransportChargesData {
      * Delete by transport_id
      */
     public function deleteByTransportId(int $transport_id): bool {
-        $sql = "DELETE FROM transport_charges WHERE transport_id = ?";
+        $sql = "DELETE FROM base_rates WHERE transport_id = ?";
         return (bool)$this->db->execute($sql, [$transport_id]);
     }
 
@@ -138,7 +138,7 @@ class TransportChargesData {
      * Find by transport_id
      */
     public function findByTransportId(int $transport_id): ?array {
-        $sql = "SELECT * FROM transport_charges WHERE transport_id = ?";
+        $sql = "SELECT * FROM base_rates WHERE transport_id = ?";
         $result = $this->db->query($sql, [$transport_id]);
         return $result[0] ?? null;
     }
@@ -147,8 +147,9 @@ class TransportChargesData {
      * Find by id
      */
     public function findById(int $id): ?array {
-        $sql = "SELECT * FROM transport_charges WHERE id = ?";
+        $sql = "SELECT * FROM base_rates WHERE id = ?";
         $result = $this->db->query($sql, [$id]);
         return $result[0] ?? null;
     }
 }
+

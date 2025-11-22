@@ -13,6 +13,8 @@
  * locally (shows success and clears fields) so the UI can be tested.
  */
 
+session_start();
+
 require_once __DIR__ . '/../database/Database.php';
 // Require the rates service and data files (now present in the project)
 require_once __DIR__ . '/../services/RatesService.php';
@@ -34,17 +36,18 @@ $error = '';
 $missingRequired = false;
 $existing_id = null;
 $basic_fee = $included_miles = $extra_mile_rate = $assistant_fee = $effective_date = $notes = '';
-$customer_number = ''; // track selected customer for save
+$customer_id = ''; // track selected customer for save
+$override_checked = isset($_POST['override_rates']) ? true : false;
 
-// Simple GET endpoint to return rates for a specific customer_number as JSON
+// Simple GET endpoint to return rates for a specific customer id as JSON
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'get_rates') {
-    $customer_number = $_GET['customer_number'] ?? '';
+    $customer_id = $_GET['customer_id'] ?? '';
     header('Content-Type: application/json');
-    if ($customer_number === '' || !ctype_digit(strval($customer_number))) {
-        echo json_encode(['error' => 'Invalid customer_number']);
+    if ($customer_id === '' || !ctype_digit(strval($customer_id))) {
+        echo json_encode(['error' => 'Invalid customer_id']);
         exit;
     }
-    $custNum = (int)$customer_number;
+    $custNum = (int)$customer_id;
 
     // Prefer using the service layer if available
     $ratesRow = null;
@@ -59,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     // Fallback: direct DB query if service not available or failed
     if (empty($ratesRow)) {
         try {
-            $stmt = $db->getPdo()->prepare("SELECT * FROM rates WHERE customer_number = ? ORDER BY id DESC LIMIT 1");
+            $stmt = $db->getPdo()->prepare("SELECT * FROM rates WHERE customer_id = ? ORDER BY id DESC LIMIT 1");
             $stmt->execute([$custNum]);
             $ratesRow = $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
@@ -87,7 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $assistant_fee = isset($existing['assistant_fee']) ? (string)$existing['assistant_fee'] : '';
             $effective_date = isset($existing['effective_date']) ? (string)$existing['effective_date'] : '';
             $notes = isset($existing['notes']) ? (string)$existing['notes'] : '';
-            $customer_number = isset($existing['customer_number']) ? (string)$existing['customer_number'] : '';
+            $customer_id = isset($existing['customer_id']) ? (string)$existing['customer_id'] : '';
         }
     }
 }
@@ -126,7 +129,7 @@ function validate_rates_fields($basicFee, $includedMiles, $extraMileRate, $assis
     // Validate date format YYYY-MM-DD
     $d = DateTime::createFromFormat('Y-m-d', $effectiveDate);
     if (!($d && $d->format('Y-m-d') === $effectiveDate)) {
-        return 'Effective date must be a valid date (YYYY-MM-DD).';
+        return 'Effective date must be a valid date (Y-m-d).';
     }
 
     return '';
@@ -143,7 +146,7 @@ function sanitize_and_trim_rates_fields($input) {
         'assistant_fee' => trim($input['assistant_fee'] ?? ''),
         'effective_date' => trim($input['effective_date'] ?? ''),
         'notes' => trim($input['notes'] ?? ''),
-        'customer_number' => trim($input['customer_number'] ?? '')
+        'customer_id' => trim($input['customer_id'] ?? '')
     ];
 }
 
@@ -160,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $status = 'deleted';
             // clear fields
             $basic_fee = $included_miles = $extra_mile_rate = $assistant_fee = $effective_date = $notes = '';
-            $customer_number = '';
+            $customer_id = '';
             $existing_id = null;
         } catch (Exception $e) {
             $error = 'Error deleting rates: ' . htmlspecialchars($e->getMessage());
@@ -170,8 +173,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fields = sanitize_and_trim_rates_fields($_POST);
         extract($fields);
 
-        // Ensure $customer_number variable exists for template usage
-        $customer_number = $customer_number ?? '';
+        // Ensure $customer_id variable exists for template usage
+        $customer_id = $customer_id ?? '';
 
         $error = validate_rates_fields($basic_fee, $included_miles, $extra_mile_rate, $assistant_fee, $effective_date);
         if ($error === 'Please fill in all required fields.') {
@@ -189,8 +192,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'assistant_fee' => floatval($assistant_fee),
                 'effective_date' => $effective_date,
                 'notes' => $notes,
-                // Persist customer_number if provided and numeric; otherwise null
-                'customer_number' => ($customer_number !== '' && ctype_digit((string)$customer_number)) ? (int)$customer_number : null
+                // Persist customer_id if provided and numeric; otherwise null
+                'customer_id' => ($customer_id !== '' && ctype_digit((string)$customer_id)) ? (int)$customer_id : null
             ];
 
             try {
@@ -206,7 +209,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 // Clear form fields after successful add/update per project rules
                 $basic_fee = $included_miles = $extra_mile_rate = $assistant_fee = $effective_date = $notes = '';
-                $customer_number = '';
+                $customer_id = '';
             } catch (Exception $e) {
                 $error = 'Error saving rates: ' . htmlspecialchars($e->getMessage());
             }
@@ -271,17 +274,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                 <!-- Customer selector row: placed before other fields -->
                                 <div class="row form-section mb-3">
-                                    <div class="col-md-8">
-                                        <label for="customer_number" class="form-label">Select Customer</label>
-                                        <select id="customer_number" name="customer_number" class="form-select">
+                                    <div class="col-md-10">
+                                        <label for="customer_id" class="form-label">Select Customer</label>
+                                        <select id="customer_id" name="customer_id" class="form-select">
                                             <option value="" selected>Select</option>
                                             <?php foreach ($customers as $c): ?>
-                                                <option value="<?= htmlspecialchars($c['customer_number'] ?? '') ?>" <?= ($customer_number !== '' && $customer_number == ($c['customer_number'] ?? '')) ? 'selected' : '' ?>><?= htmlspecialchars($c['company_name'] ?? '') ?> (<?= htmlspecialchars($c['customer_number'] ?? '') ?>)</option>
+                                                <option value="<?= htmlspecialchars($c['id'] ?? '') ?>" <?= ($customer_id !== '' && $customer_id == ($c['id'] ?? '')) ? 'selected' : '' ?>><?= htmlspecialchars($c['company_name'] ?? '') ?> (<?= htmlspecialchars($c['id'] ?? '') ?>)</option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
-                                    <div class="col-md-4 d-flex align-items-end">
-                                        <button type="button" id="get_rates_btn" class="btn btn-secondary">Get Rates</button>
+                                    <div class="col-md-2 d-flex align-items-end justify-content-end">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="1" id="override_rates" name="override_rates" <?php if ($override_checked) echo 'checked'; ?>>
+                                            <label class="form-check-label" for="override_rates">Allow override base rates</label>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -322,7 +328,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <label for="effective_date" class="form-label required">Effective Date</label>
                                         <input type="date" class="form-control<?= ($error && ($effective_date === '' || !DateTime::createFromFormat('Y-m-d', $effective_date))) ? ' is-invalid' : '' ?>" id="effective_date" name="effective_date" value="<?= htmlspecialchars($effective_date ?? '') ?>" required>
                                         <?php render_invalid_feedback('Please fill out this field.', $missingRequired && $effective_date === ''); ?>
-                                        <?php render_invalid_feedback('Effective date must be a valid date (YYYY-MM-DD).', $error && $effective_date !== '' && !DateTime::createFromFormat('Y-m-d', $effective_date)); ?>
+                                        <?php render_invalid_feedback('Effective date must be a valid date (Y-m-d).', $error && $effective_date !== '' && !DateTime::createFromFormat('Y-m-d', $effective_date)); ?>
                                     </div>
 
                                     <div class="col-md-6">
@@ -384,81 +390,127 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!-- Get Rates button handler: fetch rates JSON and populate fields -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    var btn = document.getElementById('get_rates_btn');
-    var sel = document.getElementById('customer_number');
-    btn && btn.addEventListener('click', function() {
-        var cust = sel.value;
+    var sel = document.getElementById('customer_id');
+    var overrideCheckbox = document.getElementById('override_rates');
+
+    function setFieldsReadOnly(makeReadOnly) {
+        var ids = ['basic_fee','included_miles','extra_mile_rate','assistant_fee','effective_date','notes'];
+        ids.forEach(function(id){
+            var el = document.getElementById(id);
+            if (!el) return;
+            if (makeReadOnly) {
+                el.setAttribute('readonly', 'readonly');
+                el.classList.add('bg-light');
+            } else {
+                el.removeAttribute('readonly');
+                el.classList.remove('bg-light');
+            }
+        });
+    }
+
+    // Toggle readonly when the checkbox is changed
+    if (overrideCheckbox) {
+        overrideCheckbox.addEventListener('change', function() {
+            if (overrideCheckbox.checked) {
+                setFieldsReadOnly(false);
+            } else {
+                var first = document.getElementById('basic_fee');
+                if (first && first.value !== '') {
+                    setFieldsReadOnly(true);
+                }
+            }
+        });
+    }
+
+    function clearRateFields() {
+        var ids = ['basic_fee','included_miles','extra_mile_rate','assistant_fee','effective_date','notes'];
+        ids.forEach(function(id){
+            var el = document.getElementById(id);
+            if (!el) return;
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') el.value = '';
+            el.classList && el.classList.remove('is-invalid');
+        });
+    }
+
+    function showInfoMessage(msg) {
+        var cardBody = document.querySelector('.card-body');
+        if (!cardBody) return;
+        var prev = document.getElementById('rates_info');
+        if (prev) prev.remove();
+        var info = document.createElement('div');
+        info.id = 'rates_info';
+        info.className = 'alert alert-info';
+        info.role = 'alert';
+        info.textContent = msg;
+        cardBody.insertBefore(info, cardBody.firstChild);
+        setTimeout(function(){ var el = document.getElementById('rates_info'); if (el) el.remove(); }, 6000);
+    }
+
+    function fetchRatesForCustomer(cust) {
         if (!cust) {
-            sel.classList.add('is-invalid');
+            // Match previous Get Rates button behavior: if no customer selected, show validation and don't fetch.
+            if (sel) sel.classList.add('is-invalid');
             return;
         }
-        sel.classList.remove('is-invalid');
-        fetch('rates-edit.php?action=get_rates&customer_number=' + encodeURIComponent(cust))
+
+        if (sel) sel.classList.remove('is-invalid');
+        fetch('rates-edit.php?action=get_rates&customer_id=' + encodeURIComponent(cust))
             .then(function(resp) { return resp.json(); })
             .then(function(json) {
-                // If server says no rates found, clear fields so user can add new rates
                 if (json.error) {
                     if (json.error === 'No rates found') {
-                        // Clear all known fields and remove validation error styling
-                        var ids = ['basic_fee','included_miles','extra_mile_rate','assistant_fee','effective_date','notes'];
-                        ids.forEach(function(id){
-                            var el = document.getElementById(id);
-                            if (el) {
-                                // clear value
-                                if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT') el.value = '';
-                                // remove invalid styling
-                                el.classList && el.classList.remove('is-invalid');
-                            }
-                        });
-
-                        // Focus the first field so user can start typing
+                        clearRateFields();
+                        setFieldsReadOnly(false);
                         var first = document.getElementById('basic_fee');
                         if (first) first.focus();
-
-                        // Show a temporary info alert above the form to inform the user
-                        var cardBody = document.querySelector('.card-body');
-                        if (cardBody) {
-                            // Remove existing info message if present
-                            var prev = document.getElementById('rates_info');
-                            if (prev) prev.remove();
-                            var info = document.createElement('div');
-                            info.id = 'rates_info';
-                            info.className = 'alert alert-info';
-                            info.role = 'alert';
-                            info.textContent = 'No existing rates found for the selected customer. Fields have been cleared so you may add new rates.';
-                            cardBody.insertBefore(info, cardBody.firstChild);
-                            // Auto-remove after 6 seconds
-                            setTimeout(function(){
-                                var el = document.getElementById('rates_info');
-                                if (el) el.remove();
-                            }, 6000);
-                        }
-
+                        showInfoMessage('No existing rates found for the selected customer. Fields have been cleared so you may add new rates.');
                         return;
                     }
-
-                    // Other errors: show alert
                     alert('Error: ' + json.error);
                     return;
                 }
+
                 var data = json.data || {};
-                document.getElementById('basic_fee').value = data.basic_fee ?? '';
-                document.getElementById('included_miles').value = data.included_miles ?? '';
-                document.getElementById('extra_mile_rate').value = data.extra_mile_rate ?? '';
-                document.getElementById('assistant_fee').value = data.assistant_fee ?? '';
-                document.getElementById('effective_date').value = data.effective_date ?? '';
-                document.getElementById('notes').value = data.notes ?? '';
-                // Remove any client-side invalid classes when we successfully load data
+                var safeSet = function(id, val) { var el = document.getElementById(id); if (el) el.value = (val !== undefined && val !== null) ? val : ''; };
+                safeSet('basic_fee', data.basic_fee ?? '');
+                safeSet('included_miles', data.included_miles ?? '');
+                safeSet('extra_mile_rate', data.extra_mile_rate ?? '');
+                safeSet('assistant_fee', data.assistant_fee ?? '');
+                safeSet('effective_date', data.effective_date ?? '');
+                safeSet('notes', data.notes ?? '');
+
                 ['basic_fee','included_miles','extra_mile_rate','assistant_fee','effective_date','notes'].forEach(function(id){
                     var el = document.getElementById(id);
-                    if (el) el.classList && el.classList.remove('is-invalid');
+                    if (el && el.classList) el.classList.remove('is-invalid');
                 });
+
+                if (overrideCheckbox && !overrideCheckbox.checked) {
+                    setFieldsReadOnly(true);
+                } else {
+                    setFieldsReadOnly(false);
+                }
             }).catch(function(err){
                 console.error(err);
                 alert('Failed to retrieve rates for the selected customer.');
             });
-    });
+    }
+
+    // Load rates on customer change
+    if (sel) {
+        sel.addEventListener('change', function() { fetchRatesForCustomer(sel.value); });
+        // Initial load if a customer is pre-selected
+        if (sel.value) fetchRatesForCustomer(sel.value);
+    }
+
+    // On initial load, if override checkbox is unchecked and fields already have values, lock them
+    try {
+        if (overrideCheckbox && !overrideCheckbox.checked) {
+            var first = document.getElementById('basic_fee');
+            if (first && first.value !== '') setFieldsReadOnly(true);
+        }
+    } catch (e) {}
 });
 </script>
+
 </body>
 </html>

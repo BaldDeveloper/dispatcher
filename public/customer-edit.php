@@ -98,7 +98,7 @@ function normalize_customer_fields_for_db($fields) {
 
 // If editing, load existing customer data
 if ($mode === 'edit' && $id && $_SERVER['REQUEST_METHOD'] !== 'POST') {
-    $customer = $customerService->findByCustomerNumber($id);
+    $customer = $customerService->findById($id);
     if ($customer) {
         $company_name = $customer['company_name'] ?? '';
         $phone_number = $customer['phone_number'] ?? '';

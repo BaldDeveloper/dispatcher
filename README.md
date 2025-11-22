@@ -4,7 +4,7 @@
 Dispatcher is a web-based management system for coroners, funeral homes, and transport businesses. It streamlines the process of tracking decedents, transports, pouches, and charges, with robust user management and audit logging.
 
 ## Features
-- Customer, coroner, decedent, and transport management
+- Customer, coroner, decedents, and transport management
 - Pouch and transport charge tracking
 - User authentication and role-based access (Admin, Coroner, Firm, Driver)
 - Secure authentication and session management
@@ -35,7 +35,7 @@ Dispatcher is a web-based management system for coroners, funeral homes, and tra
 ## Database Schema (Key Tables)
 - **customer:** Stores company info, phone, email, address, state, zip
 - **coroner:** Coroner name, contact info, address, state, zip
-- **decedent:** First/last name, ethnicity, gender, transport linkage
+- **decedents:** First/last name, ethnicity, gender, transport linkage
 - **transport:** Firm, date, locations, coroner, pouch, times, transporters
 - **users:** Name, email, role, phone, password
 - **pouch:** Pouch types

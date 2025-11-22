@@ -42,7 +42,7 @@ require_once __DIR__ . '/../database/Database.php';
                 <select id="destination_location" name="destination_location" class="form-control<?= isset($error) && strpos($error, 'destination_location') !== false ? ' is-invalid' : '' ?>" style="width:95%;" required>
                     <option value="">Select Destination Location</option>
                     <?php foreach ($destinationLocations as $destination): ?>
-                        <option value="<?= htmlspecialchars($destination['id']) ?>" <?= (isset($destinationLocation) && $destinationLocation == $destination['id']) ? 'selected' : '' ?>>
+                        <option value="<?= htmlspecialchars($destination['id']) ?>" <?= (isset($destinationLocation) && $destinationLocation == $destination['id']) ? 'selected' : '' ?> >
                             <?= htmlspecialchars($destination['name']) ?>
                         </option>
                     <?php endforeach; ?>
@@ -56,8 +56,8 @@ require_once __DIR__ . '/../database/Database.php';
                 <select id="coroner" name="coroner" class="form-control<?= isset($error) && strpos($error, 'coroner') !== false ? ' is-invalid' : '' ?>" style="width:95%;" required>
                     <option value="" <?= empty($coronerName) ? 'selected' : '' ?>>Select Coroner</option>
                     <?php foreach ($coroners as $coroner): ?>
-                        <option value="<?= htmlspecialchars($coroner['id'] ?? $coroner['coroner_number']) ?>" <?= (isset($coronerName) && $coronerName === $coroner['coroner_name']) ? 'selected' : '' ?>>
-                            <?= htmlspecialchars($coroner['coroner_name']) ?>
+                        <option value="<?= htmlspecialchars($coroner['id'] ?? '') ?>" <?= (isset($coronerName) && ($coronerName == ($coroner['id'] ?? '') || $coronerName === ($coroner['coroner_name'] ?? ''))) ? 'selected' : '' ?> >
+                            <?= htmlspecialchars($coroner['coroner_name'] ?? '') ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
@@ -84,7 +84,7 @@ require_once __DIR__ . '/../database/Database.php';
                     <option value="" <?= empty($pouchType) ? 'selected' : '' ?>>Select Pouch Type</option>
                     <?php foreach ($pouchTypes as $pouch): ?>
                         <?php $type = $pouch['pouch_type'] ?? $pouch['type'] ?? $pouch; ?>
-                        <option value="<?= htmlspecialchars($type) ?>" <?= (isset($pouchType) && $pouchType === $type) ? 'selected' : '' ?>>
+                        <option value="<?= htmlspecialchars($type) ?>" <?= (isset($pouchType) && $pouchType === $type) ? 'selected' : '' ?> >
                             <?= htmlspecialchars($type) ?>
                         </option>
                     <?php endforeach; ?>
@@ -100,7 +100,7 @@ require_once __DIR__ . '/../database/Database.php';
                 <select id="primary_transporter" name="primary_transporter" class="form-control<?= isset($error) && strpos($error, 'primary_transporter') !== false ? ' is-invalid' : '' ?>" style="width:95%;" required>
                     <option value="" <?= empty($primaryTransporter) ? 'selected' : '' ?>>Select Primary Transporter</option>
                     <?php foreach ($drivers as $driver): ?>
-                        <option value="<?= htmlspecialchars($driver['id']) ?>" <?= (isset($primaryTransporter) && $primaryTransporter == $driver['id']) ? 'selected' : '' ?>>
+                        <option value="<?= htmlspecialchars($driver['id']) ?>" <?= (isset($primaryTransporter) && $primaryTransporter == $driver['id']) ? 'selected' : '' ?> >
                             <?= htmlspecialchars($driver['username']) ?>
                         </option>
                     <?php endforeach; ?>
@@ -114,7 +114,7 @@ require_once __DIR__ . '/../database/Database.php';
                 <select id="assistant_transporter" name="assistant_transporter" class="form-control" style="width:95%;">
                     <option value="" <?= empty($assistantTransporter) ? 'selected' : '' ?>>None</option>
                     <?php foreach ($drivers as $driver): ?>
-                        <option value="<?= htmlspecialchars($driver['id']) ?>" <?= (isset($assistantTransporter) && $assistantTransporter == $driver['id']) ? 'selected' : '' ?>>
+                        <option value="<?= htmlspecialchars($driver['id']) ?>" <?= (isset($assistantTransporter) && $assistantTransporter == $driver['id']) ? 'selected' : '' ?> >
                             <?= htmlspecialchars($driver['username']) ?>
                         </option>
                     <?php endforeach; ?>

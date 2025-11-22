@@ -4,7 +4,7 @@ require_once __DIR__ . '/../database/Database.php';
 /**
  * TransportService
  *
- * Service class for transport-related business logic.
+ * Service class for dispatch-related business logic (table: dispatches).
  *
  * Methods in this class handle business rules, formatting, and validation
  * that are not strictly data access (which remains in TransportData).
@@ -26,7 +26,7 @@ class TransportService {
     }
 
     /**
-     * Find a transport by ID.
+     * Find a dispatch by ID.
      * @param int|string $id
      * @return array|null
      */
@@ -35,7 +35,7 @@ class TransportService {
     }
 
     /**
-     * Delete a transport by ID.
+     * Delete a dispatch by ID.
      * @param int|string $id
      * @return bool|int
      */
@@ -44,7 +44,7 @@ class TransportService {
     }
 
     /**
-     * Create a new transport record.
+     * Create a new dispatch record.
      * @param ... (see TransportData for full param list)
      * @return int|false New transport ID or false on failure
      */
@@ -53,7 +53,7 @@ class TransportService {
     }
 
     /**
-     * Update an existing transport record.
+     * Update an existing dispatch record.
      * @param ... (see TransportData for full param list)
      * @return bool|int
      */
@@ -62,7 +62,7 @@ class TransportService {
     }
 
     /**
-     * Get the total number of transports.
+     * Get the total number of dispatches.
      * @return int
      */
     public function getCount() {
@@ -70,7 +70,7 @@ class TransportService {
     }
 
     /**
-     * Get paginated list of transports.
+     * Get paginated list of dispatches.
      * @param int $pageSize
      * @param int $offset
      * @return array
@@ -80,7 +80,7 @@ class TransportService {
     }
 
     /**
-     * Get all transports.
+     * Get all dispatches.
      * @return array
      */
     public function getAll() {
@@ -88,7 +88,7 @@ class TransportService {
     }
 
     /**
-     * Get the total number of transports matching a search term.
+     * Get the total number of dispatches matching a search term.
      * @param string $search
      * @return int
      */
@@ -97,7 +97,7 @@ class TransportService {
     }
 
     /**
-     * Get paginated list of transports matching a search term.
+     * Get paginated list of dispatches matching a search term.
      * @param string $search
      * @param int $pageSize
      * @param int $offset

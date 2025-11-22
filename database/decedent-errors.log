@@ -1,0 +1,201 @@
+[2025-10-05 10:54:04] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-05 10:54:04] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => John
+    [1] => Doe
+    [2] => American Indian or Alaska Native
+    [3] => Male
+    [4] => 1038
+)
+
+[2025-10-05 10:56:49] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-05 10:56:49] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => John
+    [1] => Doe
+    [2] => American Indian or Alaska Native
+    [3] => Male
+    [4] => 1038
+)
+
+[2025-10-05 11:05:02] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-05 11:05:02] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Jill
+    [1] => Doe
+    [2] => White
+    [3] => Female
+    [4] => 1039
+)
+
+[2025-10-05 12:13:43] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-05 12:13:43] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Jill
+    [1] => Doe
+    [2] => White
+    [3] => Female
+    [4] => 1041
+)
+
+[2025-10-09 09:55:14] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-09 09:55:14] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Joey
+    [1] => Doey
+    [2] => American Indian or Alaska Native
+    [3] => Female
+    [4] => 1045
+)
+
+[2025-10-09 09:55:35] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-09 09:55:35] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Joey
+    [1] => Doey
+    [2] => American Indian or Alaska Native
+    [3] => Female
+    [4] => 1045
+)
+
+[2025-10-09 09:56:17] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-09 09:56:17] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Joey
+    [1] => Doey
+    [2] => American Indian or Alaska Native
+    [3] => Female
+    [4] => 1045
+)
+
+[2025-10-09 09:59:35] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-09 09:59:35] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Joey
+    [1] => Doey
+    [2] => American Indian or Alaska Native
+    [3] => Female
+    [4] => 1045
+)
+
+[2025-10-09 10:01:31] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-09 10:01:31] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Joey
+    [1] => Doey
+    [2] => American Indian or Alaska Native
+    [3] => Female
+    [4] => 1045
+)
+
+[2025-10-09 10:01:45] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-09 10:01:45] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Joey
+    [1] => Doey
+    [2] => American Indian or Alaska Native
+    [3] => Female
+    [4] => 1045
+)
+
+[2025-10-09 10:05:47] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-09 10:05:47] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Jack
+    [1] => Doe
+    [2] => Asian
+    [3] => Non-binary
+    [4] => 1044
+)
+
+[2025-10-09 10:05:58] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-09 10:05:58] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Jill
+    [1] => Doe
+    [2] => White
+    [3] => Female
+    [4] => 1043
+)
+
+[2025-10-09 10:06:10] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-09 10:06:10] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => John
+    [1] => Doe
+    [2] => Asian
+    [3] => Male
+    [4] => 1042
+)
+
+[2025-10-11 10:35:55] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-11 10:35:55] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Test3
+    [1] => test2
+    [2] => American Indian or Alaska Native
+    [3] => Male
+    [4] => 1048
+)
+
+[2025-10-14 10:09:59] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE transport_id = ?
+[2025-10-14 10:09:59] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => test
+    [1] => test
+    [2] => American Indian or Alaska Native
+    [3] => Male
+    [4] => 1049
+)
+[2025-11-18 11:24:18] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:15:43] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:19:41] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:19:41] [DecedentData::insertByTransportId] SQL: INSERT INTO decedents (`id`, first_name, last_name, ethnicity, gender) VALUES (?, ?, ?, ?, ?)
+[2025-11-22 12:19:41] [DecedentData::insertByTransportId] Params: Array
+(
+    [0] => 1055
+    [1] => Jeffrey
+    [2] => Simmons
+    [3] => American Indian or Alaska Native
+    [4] => Male
+)
+
+[2025-11-22 12:19:48] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:20:03] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:20:09] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:20:18] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:25:12] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:25:29] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:29:06] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:29:19] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:29:19] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE `id` = ?
+[2025-11-22 12:29:19] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => 
+    [1] => 
+    [2] => American Indian or Alaska Native
+    [3] => Male
+    [4] => 1053
+)
+
+[2025-11-22 12:29:24] [DecedentData::detectTransportColumn] No transport column found in decedents table. Defaulting to 'id'. Columns: [{"Field":"transport_id","Type":"int","Null":"NO","Key":"PRI","Default":null,"Extra":""},{"Field":"first_name","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"last_name","Type":"varchar(300)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"ethnicity","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""},{"Field":"gender","Type":"varchar(200)","Null":"YES","Key":"","Default":null,"Extra":""}]
+[2025-11-22 12:32:16] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE `transport_id` = ?
+[2025-11-22 12:32:16] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Jon
+    [1] => Doe
+    [2] => White
+    [3] => Female
+    [4] => 1053
+)
+
+[2025-11-22 12:32:24] [DecedentData::updateByTransportId] SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE `transport_id` = ?
+[2025-11-22 12:32:24] [DecedentData::updateByTransportId] Params: Array
+(
+    [0] => Jon
+    [1] => Doe
+    [2] => American Indian or Alaska Native
+    [3] => Male
+    [4] => 1053
+)
+

@@ -93,7 +93,8 @@ function normalize_coroner_fields_for_db($fields) {
 
 // If editing, load existing coroner data
 if ($mode === 'edit' && $id && $_SERVER['REQUEST_METHOD'] !== 'POST') {
-    $coroner = $coronerService->findByCoronerNumber($id);
+    // Use the standardized findById method (backward-compatible alias exists in service)
+    $coroner = $coronerService->findById($id);
     if ($coroner) {
         $coronerName = $coroner['coroner_name'] ?? '';
         $county = $coroner['county'] ?? '';

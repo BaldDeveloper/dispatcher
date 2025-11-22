@@ -102,7 +102,7 @@ header('Expires: 0');
                                     <table class="table table-bordered table-hover mb-0">
                                         <thead class="table-light">
                                         <tr>
-                                            <th>Coroner #</th>
+                                            <th>Coroner ID</th>
                                             <th>Name</th>
                                             <th>Phone</th>
                                             <th>Email</th>
@@ -112,7 +112,7 @@ header('Expires: 0');
                                         <tbody>
                                         <?php foreach ($coroners as $coroner): ?>
                                             <tr>
-                                                <td><a href="coroner-edit.php?mode=edit&id=<?= htmlspecialchars($coroner['coroner_number'] ?? '') ?>"><?= htmlspecialchars($coroner['coroner_number'] ?? '') ?></a></td>
+                                                <td><a href="coroner-edit.php?mode=edit&id=<?= htmlspecialchars($coroner['id'] ?? '') ?>"><?= htmlspecialchars($coroner['id'] ?? '') ?></a></td>
                                                 <td><?= htmlspecialchars($coronerService->formatDisplayName($coroner)) ?></td> <!-- Use service for display name -->
                                                 <td><?= htmlspecialchars($coroner['phone_number'] ?? '') ?></td>
                                                 <td><?= htmlspecialchars($coroner['email_address'] ?? '') ?></td>

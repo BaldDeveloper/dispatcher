@@ -39,16 +39,18 @@ class CoronerService {
     }
 
     /**
-     * Find a coroner by coroner_number (ID).
+     * Find a coroner by ID.
+     * Uses the standardized `id` field on the `coroners` table.
      * @param int|string $id
      * @return array|null
      */
-    public function findByCoronerNumber($id) {
-        return $this->repo->findByCoronerNumber($id);
+    public function findById($id) {
+        // Delegate to the repository's findById which queries the `coroners` table by `id`.
+        return $this->repo->findById((int)$id);
     }
 
     /**
-     * Delete a coroner by coroner_number (ID).
+     * Delete a coroner by ID.
      * @param int|string $id
      * @return bool
      */

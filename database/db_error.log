@@ -1,0 +1,114 @@
+[2025-11-14 11:59:12] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1054]
+[2025-11-14 12:00:13] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1054]
+[2025-11-22 12:19:41] PDOException in insert: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'field list'
+SQL: INSERT INTO base_rates (
+            transport_id, removal_charge, pouch_charge, transport_fees, wait_charge, mileage_fees,
+            other_charge_1, other_charge_1_description, other_charge_2, other_charge_2_description, other_charge_3, other_charge_3_description,
+            other_charge_4, other_charge_4_description, total_charge
+        ) VALUES (
+            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+        )
+Params: [1055,0,0,0,0,0,0,null,0,null,0,null,0,null,0]
+[2025-11-22 12:19:41] PDOException in insert: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'field list'
+SQL: INSERT INTO decedents (`id`, first_name, last_name, ethnicity, gender) VALUES (?, ?, ?, ?, ?)
+Params: [1055,"Jeffrey","Simmons","American Indian or Alaska Native","Male"]
+[2025-11-22 12:19:48] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1055]
+[2025-11-22 12:19:48] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'where clause'
+SQL: SELECT * FROM decedents WHERE `id` = ? LIMIT 1
+Params: [1055]
+[2025-11-22 12:20:03] PDOException in execute: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'where clause'
+SQL: DELETE FROM decedents WHERE `id` = ?
+Params: [1055]
+[2025-11-22 12:20:03] PDOException in execute: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: DELETE FROM base_rates WHERE transport_id = ?
+Params: [1055]
+[2025-11-22 12:20:10] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1054]
+[2025-11-22 12:20:10] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'where clause'
+SQL: SELECT * FROM decedents WHERE `id` = ? LIMIT 1
+Params: [1054]
+[2025-11-22 12:20:19] PDOException in execute: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'where clause'
+SQL: DELETE FROM decedents WHERE `id` = ?
+Params: [1054]
+[2025-11-22 12:20:19] PDOException in execute: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: DELETE FROM base_rates WHERE transport_id = ?
+Params: [1054]
+[2025-11-22 12:25:13] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1053]
+[2025-11-22 12:25:13] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'where clause'
+SQL: SELECT * FROM decedents WHERE `id` = ? LIMIT 1
+Params: [1053]
+[2025-11-22 12:29:06] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1053]
+[2025-11-22 12:29:06] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'where clause'
+SQL: SELECT * FROM decedents WHERE `id` = ? LIMIT 1
+Params: [1053]
+[2025-11-22 12:29:19] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1053]
+[2025-11-22 12:29:19] PDOException in insert: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'field list'
+SQL: INSERT INTO base_rates (
+            transport_id, removal_charge, pouch_charge, transport_fees, wait_charge, mileage_fees,
+            other_charge_1, other_charge_1_description, other_charge_2, other_charge_2_description, other_charge_3, other_charge_3_description,
+            other_charge_4, other_charge_4_description, total_charge
+        ) VALUES (
+            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+        )
+Params: [1053,0,0,0,0,0,0,null,0,null,0,null,0,null,0]
+[2025-11-22 12:29:19] PDOException in execute: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'where clause'
+SQL: UPDATE decedents SET first_name = ?, last_name = ?, ethnicity = ?, gender = ? WHERE `id` = ?
+Params: ["","","American Indian or Alaska Native","Male",1053]
+[2025-11-22 12:29:24] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1053]
+[2025-11-22 12:29:24] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'id' in 'where clause'
+SQL: SELECT * FROM decedents WHERE `id` = ? LIMIT 1
+Params: [1053]
+[2025-11-22 12:32:10] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1053]
+[2025-11-22 12:32:16] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1053]
+[2025-11-22 12:32:16] PDOException in insert: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'field list'
+SQL: INSERT INTO base_rates (
+            transport_id, removal_charge, pouch_charge, transport_fees, wait_charge, mileage_fees,
+            other_charge_1, other_charge_1_description, other_charge_2, other_charge_2_description, other_charge_3, other_charge_3_description,
+            other_charge_4, other_charge_4_description, total_charge
+        ) VALUES (
+            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+        )
+Params: [1053,0,0,0,0,0,0,null,0,null,0,null,0,null,0]
+[2025-11-22 12:32:24] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1053]
+[2025-11-22 12:32:24] PDOException in insert: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'field list'
+SQL: INSERT INTO base_rates (
+            transport_id, removal_charge, pouch_charge, transport_fees, wait_charge, mileage_fees,
+            other_charge_1, other_charge_1_description, other_charge_2, other_charge_2_description, other_charge_3, other_charge_3_description,
+            other_charge_4, other_charge_4_description, total_charge
+        ) VALUES (
+            ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?
+        )
+Params: [1053,0,0,0,0,0,0,null,0,null,0,null,0,null,0]
+[2025-11-22 12:32:29] PDOException in query: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'transport_id' in 'where clause'
+SQL: SELECT * FROM base_rates WHERE transport_id = ?
+Params: [1053]
+[2025-11-22 12:45:27] PDOException in query: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'fmnoevmy_dispatchbase.rates' doesn't exist
+SQL: SELECT * FROM rates ORDER BY id LIMIT 1
+Params: []
+[2025-11-22 12:45:31] PDOException in query: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'fmnoevmy_dispatchbase.rates' doesn't exist
+SQL: SELECT * FROM rates WHERE customer_id = ? ORDER BY id DESC LIMIT 1
+Params: [24]
+[2025-11-22 12:45:45] PDOException in query: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'fmnoevmy_dispatchbase.rates' doesn't exist
+SQL: SELECT * FROM rates WHERE customer_id = ? ORDER BY id DESC LIMIT 1
+Params: [1046]
