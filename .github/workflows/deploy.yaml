@@ -20,8 +20,9 @@ jobs:
       - name: Deploy via SSH
         uses: easingthemes/ssh-deploy@v2.2.7
         with:
-          server: your-bluehost-domain.com
-          username: your-bluehost-username
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          server: transportadministrator.com
+          username: balddeveloper
+          key: ${{ secrets.BH_SSH_KEY }}
           local_path: ./public
           remote_path: public_html
+
