@@ -21,8 +21,9 @@ jobs:
         uses: easingthemes/ssh-deploy@v2.2.7
         with:
           server: transportadministrator.com
-          username: balddeveloper
+          username: dispatch_developer@fmn.oev.mybluehost.me
           key: ${{ secrets.BH_SSH_KEY }}
           local_path: ./public
           remote_path: public_html
+
 
