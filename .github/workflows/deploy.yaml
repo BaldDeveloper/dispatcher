@@ -8,22 +8,22 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Build application
-        run: |
-          npm install          
-
-      - name: Deploy via SSH
+      - name: Deploy to Bluehost
         uses: easingthemes/ssh-deploy@v2.2.7
         with:
-          server: transportadministrator.com
-          username: dispatch_developer@fmn.oev.mybluehost.me
-          key: ${{ secrets.BH_SSH_KEY }}
-          local_path: ./public
-          remote_path: public_html
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          REMOTE_HOST: transportadministrator.com        # replace with your Bluehost server
+          REMOTE_USER: dispatch_developer@fmn.oev.mybluehost.me    # cPanel username
+          REMOTE_PORT: 22                         # default SSH port
+          SOURCE: public                          # local folder in your repo
+          TARGET: public_html                         # remote folder on Bluehost
+          EXCLUDE: ".git*"
+
 
 
 
