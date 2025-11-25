@@ -17,12 +17,13 @@ jobs:
         uses: easingthemes/ssh-deploy@v2.2.7
         with:
           SSH_PRIVATE_KEY: ${{ secrets.BH_SSH_KEY }}
-          REMOTE_HOST: transportadministrator.com        # replace with your Bluehost server
+          REMOTE_HOST: fmn.oev.mybluehost.me         # replace with your Bluehost server
           REMOTE_USER: fmnoevmy    # cPanel username
           REMOTE_PORT: 22                         # default SSH port
           SOURCE: public                          # local folder in your repo
           TARGET: public_html                         # remote folder on Bluehost
           EXCLUDE: ".git*"
+
 
 
 
